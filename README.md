@@ -1,142 +1,189 @@
-# Computational Theory of Mind in AI
+# The Computational Theory of Mind in AI
 
-This repository contains the code and research artifacts for a master's dissertation investigating a cognitive-science-inspired approach to computational Theory of Mind.
+This repository contains the code and saved outputs for the Subjectesis experiment with `Qwen/Qwen3.5-4B`: data preparation, both training conditions, validation, final RecToM testing, OpenToM transfer, statistics and exploratory cognitive analysis.
 
-The project operationalises Subjectesis as structured supervision over perspective, evidence and bounded revision, then evaluates whether this changes Theory-of-Mind performance relative to ordinary answer-only fine-tuning.
+The study asks whether structured perspective-state supervision and bounded review help computational Theory of Mind. The results are mixed. Improvements, null results and adverse results are retained. The cognitive analysis was added after the benchmark results and is exploratory.
 
-## Research questions
+The source was recovered from the executed notebooks, their embedded Python files, the supplied statistical package and the recorded A100 continuation. It is arranged as readable Python with explanations. Prompt wording, labels and scoring rules were retained, except for the explicit OpenToM metadata correction explained below. There is no separate `docs` directory.
 
-The main research question is:
+## Repository contents
 
-> Does training a language model with Subjectesis-style perspective, evidence and revision supervision improve computational Theory-of-Mind performance, and does executing its bounded review procedure provide an additional benefit?
+| Location | Contents |
+| --- | --- |
+| `src/` | Entry scripts for training, evaluation and analysis |
+| `src/preparation/` | Revision-4 preparation rules and original tests |
+| `src/training/` | Model loading, loss, optimizer, checkpointing and runtime checks |
+| `config/` | Settings, recorded environment and source provenance |
+| `data/` | Two compressed input bundles containing data, not hidden executable code |
+| `results/` | Benchmark scores, statistics, process counts and training audit |
+| `results/cognitive/` | Probes, RSA, process summary and counterfactual predictions |
+| `figures/` | Important diagrams and plots, including cognitive results |
 
-The transfer question is:
+Saved prediction records needed for CPU analysis are included. Trained adapters, optimizer checkpoints and hidden-state arrays remain external. Temporary repair scripts, notebook display output, duplicate figure formats and obsolete OpenToM scores are omitted.
 
-> Do these effects extend to a different Theory-of-Mind benchmark without additional fine-tuning?
+## Reproduce results on CPU
 
-## Experimental design
+Use Python 3.12 in a separate environment. Run from the repository root:
 
-The experiments use Qwen3.5-4B with NF4 QLoRA adapters.
-
-Five evaluation conditions are compared:
-
-1. Base model
-2. Answer-only QLoRA
-3. Subjectesis QLoRA with direct answering
-4. Subjectesis QLoRA with an explicit perspective state and no review
-5. Subjectesis QLoRA with the perspective state and one bounded review step
-
-The in-domain evaluation uses RecToM. Transfer is evaluated on a fixed OpenToM subset of 27 stories and 621 questions without OpenToM fine-tuning.
-
-## Important training detail
-
-Both training runs completed the same full schedule of 30,266 examples. Validation selected different checkpoints for final evaluation:
-
-- Answer-only: step 1,000, approximately 8,000 training-example exposures
-- Subjectesis: step 2,500, approximately 20,000 training-example exposures
-
-The evaluated checkpoints are therefore not exposure-matched. Direct differences between the selected adapters should not be attributed only to supervision structure.
-
-The Subjectesis condition also contains substantially more supervised target tokens because its examples include structured state and review targets.
-
-## Current benchmark results
-
-### RecToM sealed test
-
-| System | Belief accuracy | Desire accuracy | Overall accuracy |
-| --- | ---: | ---: | ---: |
-| Base | 0.6734 | 0.7964 | 0.7349 |
-| Answer-only | 0.9364 | 0.9600 | 0.9482 |
-| Subjectesis direct | 0.9220 | 0.9709 | 0.9464 |
-| Subjectesis structured, no review | 0.9277 | 0.9600 | 0.9439 |
-| Subjectesis structured, review | 0.9277 | 0.9600 | 0.9439 |
-
-Both fine-tuning conditions produced large in-domain gains. The paired comparison between Subjectesis direct and answer-only did not show a clear difference. The bounded review step did not change final RecToM answers on the sealed test.
-
-### OpenToM frozen transfer subset
-
-The corrected evaluator scores all 621 questions.
-
-| System | Accuracy | Mean family macro-F1 |
-| --- | ---: | ---: |
-| Base | 0.5346 | 0.4559 |
-| Answer-only | 0.5250 | 0.4299 |
-| Subjectesis direct | 0.5185 | 0.4261 |
-| Subjectesis structured, no review | 0.5330 | 0.4501 |
-| Subjectesis structured, review | 0.5233 | 0.4415 |
-
-The transfer results are mixed. The in-domain RecToM gains do not robustly transfer to the selected OpenToM stories. The structured no-review condition numerically recovers some performance relative to Subjectesis direct, while review is not consistently helpful.
-
-The OpenToM values above use the corrected evaluator with explicit metadata keys. Earlier values produced by the superseded evaluator are not used.
-
-## Repository structure
-
-```text
-.
-├── README.md
-├── requirements.txt
-├── config/
-│   └── experiment.json
-├── src/
-│   ├── data_io.py
-│   ├── training_config.py
-│   ├── subjectesis_controller.py
-│   └── statistics.py
-├── docs/
-│   ├── architecture.md
-│   ├── methodology.md
-│   └── reproducibility.md
-├── results/
-│   ├── rectom_summary.csv
-│   └── opentom_summary.csv
-└── notebooks/
-    └── cognitive_representational_analysis.ipynb
+```bash
+python -m pip install -r requirements.txt
+python src/analyse.py
+python src/supplementary.py
+python src/test_analysis.py
+python src/integrity.py
+python src/check_cognitive_results.py
+python src/figures.py
 ```
 
-The repository is intentionally kept small. Temporary debugging scripts, interrupted runs, model checkpoints and superseded evaluation artifacts are not included.
+The scripts extract `data/frozen_analysis_inputs.zip` into `inputs/`, rejecting existing files that differ from the frozen copies. Analysis writes to `results/`. The figure script recreates PNG, PDF and SVG files; only PNG versions are tracked.
 
-## What each code file does
+| Script | Explanation |
+| --- | --- |
+| `analyse.py` | Joins predictions to references by record ID; computes accuracy and fixed-class macro F1, cluster bootstrap intervals, paired comparisons, review transitions and checkpoint exposure. |
+| `supplementary.py` | Examines task/order subgroups, parser outcomes and state-answer agreement. It generates an error casebook and replays an uncertainty-triggered review rule using saved branches, without new inference. |
+| `integrity.py` | Checks input hashes, frozen protocols, answer-free model inputs and the corrected OpenToM subset. With rebuilt preparation data, it also checks the matched training schedule. |
+| `test_analysis.py` | Tests bootstrap calculations against explicit row expansion, exact paired swaps, invalid predictions and Holm correction. |
+| `check_cognitive_results.py` | Recomputes counterfactual metrics and process counts from individual records. Checks probe split separation and final-layer table consistency without claiming to refit probes. |
+| `figures.py` | Reads the result tables and draws the benchmark, review, exposure and architecture figures without altering scores. |
+| `project_setup.py` | Extracts checked input bundles and stages readable source under the working paths expected by the original notebooks. |
 
-### `src/data_io.py`
+There are 5,000 bootstrap repetitions, resampling dialogues for RecToM and stories for OpenToM. Paired label swaps are exact for at most 18 nonzero clusters, otherwise using 50,000 simulations. Holm correction covers ten post hoc accuracy comparisons. These intervals describe sampled-example uncertainty, not variation across independently trained seeds.
 
-Contains small helper functions for reading JSON, JSONL and CSV data. Keeping input/output code separate makes the analysis scripts easier to read.
+## Data preparation
 
-### `src/training_config.py`
+```bash
+python src/train_subjectesis.py --root work/subjectesis --prepare-only
+python src/integrity.py --preparation work/subjectesis/preparation
+```
 
-Stores the final QLoRA settings used for the two completed training conditions. It also documents the validation-selected checkpoints and the effective number of examples seen by those checkpoints.
+Preparation rebuilds revision 4 from the bundled task data, split manifest and annotation decisions. It runs the 31 original preparation tests and verifies the original output hashes. No GPU is needed.
 
-### `src/subjectesis_controller.py`
+The split contains 235 training, 34 validation and 67 test dialogues. Of 2,270 original training questions, 35 are quarantined, leaving 2,235 eligible questions. Validation has 319 questions; the sealed test has 621.
 
-Provides a readable implementation of the bounded Subjectesis update rule used during structured evaluation. The controller validates a proposed state update, replaces only the selected field, and performs at most one review step.
+Both full training schedules contain 30,266 examples with identical question-exposure counts. Answer-only repeats ordinary answer supervision. Subjectesis contains 2,235 answer examples, 2,235 state-building examples and 25,796 field-review examples.
 
-### `src/statistics.py`
+| Preparation module | Explanation |
+| --- | --- |
+| `convert_v1.py` | Reads tasks and dialogue splits, separates public inputs from references, renders prompts and defines benchmark-state mappings. |
+| `build_full.py` | Applies recorded annotations and constructs answer, state and review supervision, including preserve, revise and unknown cases. |
+| `dataset_io.py` | Restricts training to eligible records and masks prompt tokens so only completion tokens contribute to loss. |
+| `packets.py` | Groups source records used by the preparation and annotation process. |
+| `audit_citation_controls.py` | Checks that citation presence alone does not determine a supervision target. |
+| `verify_tokenization.py` | Checks tokenization and truncation against the intended supervision; requires tokenizer dependencies. |
+| `test_full.py` | Checks splits, unchanged labels and held-out data, quarantine, evidence rules, masks and deterministic rebuilding. |
 
-Contains the clustered bootstrap utilities used to estimate uncertainty while resampling whole dialogues or whole stories instead of treating every question as statistically independent.
+## Training
 
-### `notebooks/cognitive_representational_analysis.ipynb`
+Model revision: `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`. Settings: NF4 QLoRA, rank 8, alpha 16, learning rate 0.0001, effective batch size 8, maximum length 2,048 and seed 42. Checkpoint selection uses the mean of validation belief and desire accuracy.
 
-Runs the exploratory post-hoc analysis of internal representations. It includes layer-wise linear probes, representational similarity analysis, monitoring/control analysis and a controlled perspective-access diagnostic. It does not retrain the language model.
+Subjectesis began on two Kaggle T4 GPUs and continued on one Colab A100. Answer-only used one A100. The scripts retain the original environment checks and install their recorded model-library dependencies. They expect the corresponding host Torch/CUDA environment; the CPU `requirements.txt` is not a GPU environment replacement.
 
-## Scope
+```bash
+# Start in the recorded two-T4 Kaggle runtime.
+python src/train_subjectesis.py --root /kaggle/working/subjectesis --mode t4
 
-This work studies computational Theory of Mind. It does not claim that the model is conscious, self-aware, biologically equivalent to a person, or a neural model of the human brain.
+# Run the original answer-only sequence in Colab on an A100.
+python src/train_answer_only.py
 
-The cognitive-science concepts are used as functional design and analysis tools. Neuroscience-inspired representational methods are used to study the model without claiming anatomical correspondence between transformer layers and brain regions.
+# Continue a historical Subjectesis archive in the recorded A100 runtime.
+python src/train_subjectesis.py --root /content/subjectesis_resume --mode a100 --resume /content/drive/MyDrive/Subjectesis/subjectesis_a100_latest.zip
+```
 
-## Model
+`train_subjectesis.py` is a small packaging entry point around recovered source. `train_answer_only.py` follows the original Colab sequence and saves recovery output to Drive. The GPU entry scripts execute stages when run and should not be imported as utilities.
 
-- Base model: `Qwen/Qwen3.5-4B`
-- Pinned model revision: `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`
-- Training method: NF4 QLoRA
-- LoRA rank: 8
-- LoRA alpha: 16
-- Learning rate: 1e-4
-- Effective batch size: 8
-- Epochs: 1
-- Random seed: 42
+| Training module | Explanation |
+| --- | --- |
+| `prepare.py` | Rebuilds data and checks the original hashes before training. |
+| `tokenize_data.py` | Applies the recorded chat template and writes completion-masked training and validation tokens. |
+| `download_model.py`, `model_contract.py` | Download and identify the pinned model and tokenizer. |
+| `model_runtime.py` | Loads the text model in NF4, freezes base weights and attaches the specified LoRA parameters. |
+| `engine.py` | Computes completion-only next-token loss, normalized by the total supervised-token count, including short final batches. Restores training mode before optimization. |
+| `train.py` | Shuffles the fixed schedule, updates adapters, evaluates validation questions, and saves resumable checkpoints and the best adapter. Test labels do not select checkpoints. |
+| `a100_answer_only.py`, `a100_subjectesis.py` | Retain the recorded single-GPU optimizer wrappers. Smaller microbatches handle memory limits while keeping the logical batch and token normalization. The Subjectesis wrapper restores gradient checkpointing. |
+| `launch.py`, `setup_runtime.py` | Check and set up the original two-T4 environment, launch training, stream progress and package recovery outputs. |
+| `common.py` | Provides checked data loading, hashing, batch grouping and recovery packaging. |
+| `tests_cpu.py`, `test_ddp_cpu.py`, `test_4b_adaptation.py`, `tiny_qwen_check.py` | Original loss, distributed accumulation, model-adaptation and small-model checks. These require training dependencies even when they do not need a GPU. |
 
-Large adapter and optimizer files are not stored in the Git repository. The repository records the configuration and results needed to identify the runs without turning the source repository into checkpoint storage.
+Formatting changes source-byte hashes. Historical resume therefore restores exact code from the verified recovery archive and retains the original identity checks. Use a fresh working directory for restoration. A fresh run on different hardware is not claimed to reproduce identical weights.
 
-## Status
+Answer-only selected step 1,000 after 8,000 example exposures; Subjectesis selected step 2,500 after 20,000 exposures. Full schedules are exposure-matched, but evaluated checkpoints and target-token compute are not. `training_audit.csv` records these differences.
 
-The main training, RecToM evaluation and corrected OpenToM transfer evaluation are complete. The representational analysis is exploratory and is kept separate from the confirmatory benchmark results.
+## Validation, testing and transfer
+
+Put the completed `answer_only_a100_latest.zip` and `subjectesis_a100_latest.zip` archives in `MyDrive/Subjectesis/` for the Colab evaluation scripts:
+
+```bash
+python src/validate_rectom.py
+python src/evaluate_rectom.py
+python src/evaluate_opentom.py
+python src/rescore_opentom.py
+```
+
+All except the rescoring script perform GPU inference. To inspect existing results without inference, use the CPU commands above. Paths are near the top of each script. The original Drive destinations are retained; use separate output paths for a new experiment. Each script retains its saved-metadata checks for prediction reuse.
+
+| Script | Explanation |
+| --- | --- |
+| `validate_rectom.py` | Evaluates the 319 validation questions and development controller, separately from the sealed test. |
+| `evaluate_rectom.py` | Runs the frozen five-condition comparison on 621 questions. Contains the actual state construction, per-field review plan, schema checks, constrained finalizer and evidence-binding audit. |
+| `evaluate_opentom.py` | Selects the recorded smoke/final stories from pinned OpenToM commit `3f22b66276b2d7ca5fe573c28c79cc0d077aafc5`, then saves direct and structured predictions. |
+| `rescore_opentom.py` | Rebuilds corrected metadata and references and scores already-frozen predictions on CPU, retaining prediction hash checks. Downloads the pinned OpenToM source. |
+
+The five conditions are Base direct, Answer-only direct, Subjectesis direct, Subjectesis no review and Subjectesis review. The structured conditions share the same initial state.
+
+RecToM has a bounded field-review plan, not a universal one-review limit: 1,313 review calls across 621 questions, 48 field-value changes across 45 questions, and no final-answer changes. Citation binding checks text-to-turn correspondence, not semantic entailment.
+
+OpenToM required explicit lookup of `mover`, `observer`, `eoi`, `original_place` and `move_to_place`, rather than dictionary value order. Corrected scoring includes all 621 questions across 27 stories. The old 540-scorable score is obsolete. The correction did not regenerate model answers.
+
+## Results and output meanings
+
+| System | RecToM correct / 621 | RecToM task-mean accuracy | OpenToM correct / 621 | Counterfactual correct / 64 |
+| --- | ---: | ---: | ---: | ---: |
+| Base direct | 452 | 73.49% | 332 | 40 |
+| Answer-only direct | 588 | 94.82% | 326 | 58 |
+| Subjectesis direct | 586 | 94.64% | 322 | 61 |
+| Subjectesis no review | 585 | 94.39% | 331 | 64 |
+| Subjectesis review | 585 | 94.39% | 325 | 63 |
+
+In the system tables, `accuracy` means correct questions divided by all questions. `mean_family_accuracy` weights task families equally. RecToM task mean averages belief and desire accuracy, so it differs from pooled question accuracy. `mean_family_f1` averages the fixed-class macro F1 values across families. Invalid and out-of-target benchmark predictions remain errors.
+
+| Output | Meaning |
+| --- | --- |
+| `*_systems.csv`, `*_families.csv`, `*_classes.csv` | Overall, family and class scores with relevant uncertainty estimates. |
+| `paired_comparisons.csv` | Signed paired differences, cluster intervals, label-swap p-values and Holm adjustment. |
+| `*_prediction_matrix.csv` | One aligned row per question for tracing scores back to predictions. |
+| `*_process_records.csv`, `*_process_summary.json`, `rectom_review_events.csv` | Answer transitions, state changes, review decisions and evidence changes. OpenToM review corrects 9 answers and damages 15. |
+| `*_weighting_sensitivity.csv`, `*_leave_one_cluster_out.csv` | Sensitivity to weighting and removal of individual source clusters. |
+| `subgroup_metrics.csv`, `opentom_parser_audit.csv`, `rectom_state_answer_agreement.csv` | Subgroup scores, parser details and agreement between explicit states and answers. |
+| `offline_review_policy_replay.csv` | Exploratory selection of saved review branches by an uncertainty rule. |
+| `training_audit.csv`, `validation_history.csv` | Exposure, token counts and checkpoint selection. Duplicate resumed log steps are not counted as new optimizer steps. |
+| `*_reconciliation.json`, `input_hashes.json`, `integrity_audit.json` | Connections between recalculated metrics, frozen inputs and saved outputs. |
+| `semantic_case_review/notes.json` | Recorded interpretive case notes, not independent human ratings or inter-rater reliability evidence. |
+
+## Cognitive and representational analysis
+
+```bash
+python src/cognitive_analysis.py
+```
+
+This is the original A100 workflow using the completed archives and saved benchmark records. It uses the same plain RecToM prompt across all three model conditions and extracts the final real prompt-token representation from the embedding output and all 32 layers. Qwen and its adapters are frozen; the small linear probe classifiers are fitted.
+
+The code proceeds through these stages:
+
+1. Build the 2,235 / 319 / 621 question index with dialogue-separated splits.
+2. Extract and save hidden states for Base, Answer-only and Subjectesis, with a memory fallback.
+3. Fit standardized, balanced logistic regression probes with `C=1.0`. Save layer-wise scores and final-layer dialogue-bootstrap comparisons.
+4. Compare cosine-distance geometry to benchmark belief-state geometry using RSA; estimate final-layer uncertainty by deleting one dialogue at a time.
+5. Count monitoring/control events in saved records. A revision count is not itself revision correctness.
+6. Run 64 information-access cases covering first- and second-order questions and score all five inference conditions.
+
+Hidden states are saved in `MyDrive/Subjectesis/cognitive_analysis/representations/`. They are required to independently refit probes or recompute RSA and were not in the uploaded results archive. The complete code, question index, supplied result tables and plots are included. The CPU checker distinguishes table consistency from an independent representation rerun.
+
+In `counterfactual_metrics.csv`, paired accuracy means both answers in a pair are correct. Leakage means predicting the new physical location when the target observer missed the move. The original diagnostic excludes missing predictions from these denominators; all saved predictions are valid. The 64 cases are a small post hoc diagnostic, not a large new benchmark.
+
+The probe results do not show a uniform Subjectesis advantage: final-layer `seen` macro F1 is lower than Answer-only by about 0.02465. RSA alignment is higher in the supplied Subjectesis results. Neither observation establishes human-like beliefs or a correspondence between transformer layers and brain regions.
+
+## Repository verification
+
+Preparation rebuilt to the original hashes and passed all 31 data tests. CPU benchmark and supplementary analyses reproduced the supplied numerical outputs; all eight statistical tests passed. Counterfactual metrics and process counts were recomputed from individual records. Probe split separation and final-layer table consistency were checked.
+
+`config/source_provenance.json` records source origins, hashes and packaging changes. `results/repository_verification.json` records this cleanup's checks. GPU training and inference were not rerun, and probe/RSA arrays were not independently recomputed.

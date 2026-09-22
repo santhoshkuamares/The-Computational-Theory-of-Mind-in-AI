@@ -1,0 +1,11 @@
+{
+  "torch": "2.11.0+cu128",
+  "torchao": "0.16.0",
+  "transformers": "5.13.0",
+  "peft": "0.21.0",
+  "bitsandbytes": "0.49.2",
+  "accelerate": "1.12.0",
+  "tokenizers": "0.22.2",
+  "huggingface-hub": "1.11.0",
+  "safetensors": "0.8.0"
+}

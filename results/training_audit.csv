@@ -1,0 +1,3 @@
+condition,selected_step,selected_examples_seen,selected_target_tokens_seen,completed_steps,completed_examples,completed_target_tokens,full_total_tokens,log_rows,repeated_step_rows,recorded_step_seconds_last_per_step,median_step_seconds_last_per_step,reported_peak_allocated_gib,trainable_parameters
+ordinary,1000,8000,24000,3784,30266,90798,12646402,3784,0,14459.372931499029,3.3736175359999834,10.263555526733398,16232448
+subjectesis,2500,20000,2455984,3784,30266,3712246,20255604,3864,80,26032.249356792967,5.025405215500086,38.46034812927246,16232448

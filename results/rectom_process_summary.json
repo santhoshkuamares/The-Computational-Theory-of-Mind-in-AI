@@ -1,0 +1,19 @@
+{
+  "right_to_right": 585,
+  "review_calls": 1313,
+  "invalid_review": 0,
+  "initial_evidence_items": 995,
+  "initial_evidence_bound": 993,
+  "review_evidence_items": 1433,
+  "review_evidence_bound": 1431,
+  "wrong_to_wrong": 36,
+  "raw_answer_changed": 0,
+  "parsed_answer_changed": 0,
+  "value_changes": 48,
+  "basis_changes": 47,
+  "citation_changes": 46,
+  "any_state_change": 45,
+  "initial_finalizer_disagreement": 19,
+  "unknown_fields": 551,
+  "unsupported_answer_claim_count": 328
+}

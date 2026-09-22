@@ -11,7 +11,10 @@
     "learning_rate": 0.0001,
     "effective_batch_size": 8,
     "max_length": 2048,
-    "seed": 42
+    "seed": 42,
+    "full_schedule_examples_per_condition": 30266,
+    "selected_checkpoint_exposure_matched": false,
+    "target_token_compute_matched": false
   },
   "selected_checkpoints": {
     "answer_only_step": 1000,
@@ -21,12 +24,22 @@
   },
   "datasets": {
     "rectom_train_dialogues": 235,
-    "rectom_train_questions": 2270,
     "rectom_validation_dialogues": 34,
     "rectom_validation_questions": 319,
     "rectom_test_dialogues": 67,
     "rectom_test_questions": 621,
     "opentom_transfer_stories": 27,
-    "opentom_transfer_questions": 621
+    "opentom_transfer_questions": 621,
+    "rectom_train_questions_before_quarantine": 2270,
+    "rectom_train_questions_eligible": 2235,
+    "rectom_train_questions_quarantined": 35
+  },
+  "evaluation": {
+    "rectom_selection_metric": "mean of belief accuracy and desire accuracy",
+    "rectom_reported_pooled_accuracy": "correct questions / 621",
+    "rectom_review": "bounded per-field plan; 1313 calls on 621 sealed-test questions",
+    "opentom_commit": "3f22b66276b2d7ca5fe573c28c79cc0d077aafc5",
+    "opentom_scoring": "corrected explicit plot_info keys, strict 621-question denominator",
+    "cognitive_analysis": "post hoc exploratory; frozen Qwen and adapters, fitted linear probes"
   }
 }

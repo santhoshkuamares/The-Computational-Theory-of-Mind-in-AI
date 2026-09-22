@@ -1,0 +1,10 @@
+{
+  "bootstrap_repetitions": 5000,
+  "bootstrap_seed": 42,
+  "cluster_swap_seed": 20260922,
+  "monte_carlo_swaps": 50000,
+  "holm_family": "ten post-hoc accuracy contrasts across two benchmarks",
+  "new_inference": false,
+  "new_training": false,
+  "completed": true
+}

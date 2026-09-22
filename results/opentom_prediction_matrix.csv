@@ -1,0 +1,622 @@
+record_id,cluster,family,reference,base_direct,base_direct_raw,answer_only_direct,answer_only_direct_raw,subjectesis_direct,subjectesis_direct_raw,subjectesis_no_review,subjectesis_no_review_raw,subjectesis_review,subjectesis_review_raw
+74356138::location_cg_fo::0,74356138,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+74356138::location_cg_fo::1,74356138,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+74356138::location_cg_so::0,74356138,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+74356138::location_cg_so::1,74356138,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+74356138::location_fg_fo::0,74356138,location_fg_fo,2,2,in the garbage bin,2,garbage bin,2,garbage bin,2,in the garbage bin,2,in the garbage bin
+74356138::location_fg_fo::1,74356138,location_fg_fo,1,1,in a bucket,1,in a bucket,1,in a bucket,1,in a bucket,1,in a bucket
+74356138::location_fg_fo::2,74356138,location_fg_fo,2,2,in the garbage bin,2,in the garbage bin,2,in the garbage bin,2,in the garbage bin,2,in the garbage bin
+74356138::location_fg_fo::3,74356138,location_fg_fo,2,2,in the garbage bin,2,in the garbage bin,3,gone,2,in the garbage bin,2,in the garbage bin
+74356138::location_fg_so::0,74356138,location_fg_so,2,2,in the garbage bin,2,in the garbage bin,3,in the sunroom,3,no longer in the sunroom,3,no longer in the sunroom
+74356138::location_fg_so::1,74356138,location_fg_so,2,2,in the garbage bin,2,in the garbage bin,2,in the garbage bin,2,in the garbage bin,2,in the garbage bin
+74356138::multihop_fo::0,74356138,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+74356138::multihop_fo::1,74356138,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+74356138::multihop_fo::2,74356138,multihop_fo_fullness,2,2,more full,2,more full,1,less full,1,less full,1,less full
+74356138::multihop_fo::3,74356138,multihop_fo_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+74356138::multihop_fo::4,74356138,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+74356138::multihop_fo::5,74356138,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+74356138::multihop_so::0,74356138,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+74356138::multihop_so::1,74356138,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+74356138::multihop_so::2,74356138,multihop_so_fullness,2,2,more full,1,less full,1,less full,2,more full,1,less full
+74356138::multihop_so::3,74356138,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+74356138::multihop_so::4,74356138,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+74356138::multihop_so::5,74356138,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+74356138::attitude::0,74356138,attitude,1,1,positive,1,positive,1,positive,1,positive,1,positive
+99473854::location_cg_fo::0,99473854,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+99473854::location_cg_fo::1,99473854,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+99473854::location_cg_so::0,99473854,location_cg_so,1,1,Yes,1,Yes,1,Yes,1,Yes,1,Yes
+99473854::location_cg_so::1,99473854,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+99473854::location_fg_fo::0,99473854,location_fg_fo,2,2,home entrance,2,home entrance,2,home entrance,2,home entrance,2,home entrance
+99473854::location_fg_fo::1,99473854,location_fg_fo,1,3,on the top shelf,3,on the top shelf,3,on the top shelf,3,in the closet,3,in the closet
+99473854::location_fg_fo::2,99473854,location_fg_fo,2,2,home entrance,2,home entrance,2,home entrance,2,at the home entrance,2,at the home entrance
+99473854::location_fg_fo::3,99473854,location_fg_fo,1,2,home entrance,2,home entrance,2,home entrance,2,the home entrance,2,the home entrance
+99473854::location_fg_so::0,99473854,location_fg_so,1,3,top shelf,3,top shelf,3,in the closet,2,the home entrance,3,in the closet
+99473854::location_fg_so::1,99473854,location_fg_so,1,2,home entrance,2,home entrance,2,home entrance,2,the home entrance,2,the home entrance
+99473854::multihop_fo::0,99473854,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+99473854::multihop_fo::1,99473854,multihop_fo_fullness,3,1,less full,1,less full,1,less full,3,equally full,3,equally full
+99473854::multihop_fo::2,99473854,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+99473854::multihop_fo::3,99473854,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+99473854::multihop_fo::4,99473854,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+99473854::multihop_fo::5,99473854,multihop_fo_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+99473854::multihop_so::0,99473854,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+99473854::multihop_so::1,99473854,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+99473854::multihop_so::2,99473854,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+99473854::multihop_so::3,99473854,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+99473854::multihop_so::4,99473854,multihop_so_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+99473854::multihop_so::5,99473854,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+99473854::attitude::0,99473854,attitude,3,1,positive,1,positive,1,positive,1,positive,1,positive
+13695961::location_cg_fo::0,13695961,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+13695961::location_cg_fo::1,13695961,location_cg_fo,1,1,Yes,1,Yes,0,No,0,No,0,No
+13695961::location_cg_so::0,13695961,location_cg_so,0,1,Yes,0,No,0,No,0,No,0,No
+13695961::location_cg_so::1,13695961,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+13695961::location_fg_fo::0,13695961,location_fg_fo,2,2,center of the table,2,on the center of the table,2,on the center of the table,2,on the center of the table,2,on the center of the table
+13695961::location_fg_fo::1,13695961,location_fg_fo,1,3,in the depths of a cellar,3,in their hearts,3,in their hearts,3,in their hearts,3,in their hearts
+13695961::location_fg_fo::2,13695961,location_fg_fo,2,2,on the center of the table,2,on the center of the table,2,on the center of the table,2,on the center of the table,2,on the center of the table
+13695961::location_fg_fo::3,13695961,location_fg_fo,1,2,on the center of the table,2,on the center of the table,2,on the center of the table,3,in the cellar,3,in the cellar
+13695961::location_fg_so::0,13695961,location_fg_so,2,2,center of the table,3,in the cellar,2,on the center of the table,3,in the cellar,1,in the pantry
+13695961::location_fg_so::1,13695961,location_fg_so,1,2,center of the table,2,on the center of the table,2,the center of the table,2,on the center of the table,2,on the center of the table
+13695961::multihop_fo::0,13695961,multihop_fo_fullness,1,1,less full,1,less full,1,less full,3,equally full,3,equally full
+13695961::multihop_fo::1,13695961,multihop_fo_fullness,3,1,less full,3,equally full,3,equally full,3,equally full,3,equally full
+13695961::multihop_fo::2,13695961,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13695961::multihop_fo::3,13695961,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+13695961::multihop_fo::4,13695961,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+13695961::multihop_fo::5,13695961,multihop_fo_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+13695961::multihop_so::0,13695961,multihop_so_fullness,1,2,more full,1,less full,3,equally full,3,equally full,3,equally full
+13695961::multihop_so::1,13695961,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+13695961::multihop_so::2,13695961,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13695961::multihop_so::3,13695961,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+13695961::multihop_so::4,13695961,multihop_so_accessibility,1,2,less accessible,2,less accessible,2,less accessible,1,more accessible,2,less accessible
+13695961::multihop_so::5,13695961,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+13695961::attitude::0,13695961,attitude,1,2,negative,2,negative,3,neutral,3,neutral,3,neutral
+98132318::location_cg_fo::0,98132318,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+98132318::location_cg_fo::1,98132318,location_cg_fo,1,1,Yes,0,No,0,No,0,No,0,No
+98132318::location_cg_so::0,98132318,location_cg_so,0,1,Yes,0,No,0,No,0,No,0,No
+98132318::location_cg_so::1,98132318,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+98132318::location_fg_fo::0,98132318,location_fg_fo,2,2,in a donation pile,2,in a donation pile,2,in a donation pile,2,in the donation pile,2,in the donation pile
+98132318::location_fg_fo::1,98132318,location_fg_fo,1,1,inside a glass bottle,1,inside a glass bottle,1,inside a glass bottle,3,in the attic,3,in the attic
+98132318::location_fg_fo::2,98132318,location_fg_fo,2,2,in a donation pile,2,in a donation pile,2,in a donation pile,2,in the donation pile,2,in the donation pile
+98132318::location_fg_fo::3,98132318,location_fg_fo,1,2,in the donation pile,2,in a donation pile,2,in a donation pile,2,in the donation pile,2,in the donation pile
+98132318::location_fg_so::0,98132318,location_fg_so,2,2,in the donation pile,2,in the donation pile,2,in the donation pile,3,unknown,3,unknown
+98132318::location_fg_so::1,98132318,location_fg_so,1,2,in a donation pile,2,in a donation pile,2,in a donation pile,2,in the donation pile,2,in the donation pile
+98132318::multihop_fo::0,98132318,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+98132318::multihop_fo::1,98132318,multihop_fo_fullness,3,3,equally full,1,less full,3,equally full,3,equally full,3,equally full
+98132318::multihop_fo::2,98132318,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+98132318::multihop_fo::3,98132318,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+98132318::multihop_fo::4,98132318,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+98132318::multihop_fo::5,98132318,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+98132318::multihop_so::0,98132318,multihop_so_fullness,1,3,equally full,1,less full,3,equally full,3,equally full,3,equally full
+98132318::multihop_so::1,98132318,multihop_so_fullness,3,3,equally full,1,less full,1,less full,1,less full,3,equally full
+98132318::multihop_so::2,98132318,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+98132318::multihop_so::3,98132318,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+98132318::multihop_so::4,98132318,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+98132318::multihop_so::5,98132318,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+98132318::attitude::0,98132318,attitude,1,1,positive,1,positive,1,positive,1,positive,1,positive
+61757120::location_cg_fo::0,61757120,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+61757120::location_cg_fo::1,61757120,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+61757120::location_cg_so::0,61757120,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+61757120::location_cg_so::1,61757120,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+61757120::location_fg_fo::0,61757120,location_fg_fo,2,2,in the compost bin,2,compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin
+61757120::location_fg_fo::1,61757120,location_fg_fo,1,3,in the back yard,3,in the back yard,3,in the back yard,3,unknown,3,unknown
+61757120::location_fg_fo::2,61757120,location_fg_fo,2,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin
+61757120::location_fg_fo::3,61757120,location_fg_fo,2,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin
+61757120::location_fg_so::0,61757120,location_fg_so,1,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin
+61757120::location_fg_so::1,61757120,location_fg_so,2,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin,2,in the compost bin
+61757120::multihop_fo::0,61757120,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+61757120::multihop_fo::1,61757120,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+61757120::multihop_fo::2,61757120,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+61757120::multihop_fo::3,61757120,multihop_fo_fullness,2,2,more full,1,less full,2,more full,2,more full,2,more full
+61757120::multihop_fo::4,61757120,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+61757120::multihop_fo::5,61757120,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+61757120::multihop_so::0,61757120,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+61757120::multihop_so::1,61757120,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+61757120::multihop_so::2,61757120,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+61757120::multihop_so::3,61757120,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+61757120::multihop_so::4,61757120,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+61757120::multihop_so::5,61757120,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+61757120::attitude::0,61757120,attitude,2,2,negative,2,negative,2,negative,2,negative,2,negative
+90768647::location_cg_fo::0,90768647,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+90768647::location_cg_fo::1,90768647,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+90768647::location_cg_so::0,90768647,location_cg_so,1,1,Yes,0,No,0,No,0,No,0,No
+90768647::location_cg_so::1,90768647,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+90768647::location_fg_fo::0,90768647,location_fg_fo,2,2,Messiah's kitchen counter,2,Messiah's kitchen counter,2,Messiah's kitchen counter,2,on Messiah's kitchen counter,2,on Messiah's kitchen counter
+90768647::location_fg_fo::1,90768647,location_fg_fo,1,1,in the pantry,1,in the pantry,1,in the pantry,1,in the pantry,1,in the pantry
+90768647::location_fg_fo::2,90768647,location_fg_fo,2,2,on his own kitchen counter,2,on his own kitchen counter,2,on his own kitchen counter,2,on his kitchen counter,2,on his kitchen counter
+90768647::location_fg_fo::3,90768647,location_fg_fo,1,2,Messiah's kitchen counter,2,Messiah's kitchen counter,2,Messiah's kitchen counter,2,on his own kitchen counter,2,on his own kitchen counter
+90768647::location_fg_so::0,90768647,location_fg_so,1,2,Brooks' kitchen,2,Messiah's kitchen counter,1,in the pantry,1,in the pantry,2,in the kitchen counter
+90768647::location_fg_so::1,90768647,location_fg_so,1,2,on his own kitchen counter,2,on his own kitchen counter,2,on his own kitchen counter,2,on his own kitchen counter,2,on his own kitchen counter
+90768647::multihop_fo::0,90768647,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+90768647::multihop_fo::1,90768647,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+90768647::multihop_fo::2,90768647,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+90768647::multihop_fo::3,90768647,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+90768647::multihop_fo::4,90768647,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+90768647::multihop_fo::5,90768647,multihop_fo_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+90768647::multihop_so::0,90768647,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+90768647::multihop_so::1,90768647,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+90768647::multihop_so::2,90768647,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+90768647::multihop_so::3,90768647,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+90768647::multihop_so::4,90768647,multihop_so_accessibility,2,1,more accessible,2,less accessible,1,more accessible,1,more accessible,2,less accessible
+90768647::multihop_so::5,90768647,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+90768647::attitude::0,90768647,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+32725756::location_cg_fo::0,32725756,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+32725756::location_cg_fo::1,32725756,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+32725756::location_cg_so::0,32725756,location_cg_so,1,1,Yes,1,Yes,0,No,0,No,0,No
+32725756::location_cg_so::1,32725756,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+32725756::location_fg_fo::0,32725756,location_fg_fo,2,2,in a trash bag,2,in a trash bag,2,in a trash bag,2,in a trash bag,2,in a trash bag
+32725756::location_fg_fo::1,32725756,location_fg_fo,1,3,by the shed,3,by the shed,3,by the shed,3,by the shed,3,by the shed
+32725756::location_fg_fo::2,32725756,location_fg_fo,2,2,in a trash bag nearby,2,in a trash bag,2,in a trash bag,2,in the trash bag,2,in the trash bag
+32725756::location_fg_fo::3,32725756,location_fg_fo,1,2,in a trash bag,2,in a trash bag,2,in a trash bag,2,in a trash bag,2,in a trash bag
+32725756::location_fg_so::0,32725756,location_fg_so,1,3,by the shed,3,in the back yard,3,in the back yard,3,in the back yard,3,in the shed
+32725756::location_fg_so::1,32725756,location_fg_so,1,2,in a trash bag nearby,2,in a trash bag,2,in a trash bag,2,in the trash bag,2,in the trash bag
+32725756::multihop_fo::0,32725756,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+32725756::multihop_fo::1,32725756,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+32725756::multihop_fo::2,32725756,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+32725756::multihop_fo::3,32725756,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+32725756::multihop_fo::4,32725756,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+32725756::multihop_fo::5,32725756,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+32725756::multihop_so::0,32725756,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,3,equally full
+32725756::multihop_so::1,32725756,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+32725756::multihop_so::2,32725756,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+32725756::multihop_so::3,32725756,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+32725756::multihop_so::4,32725756,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+32725756::multihop_so::5,32725756,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+32725756::attitude::0,32725756,attitude,1,2,negative,2,negative,2,negative,2,negative,2,negative
+40349564::location_cg_fo::0,40349564,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+40349564::location_cg_fo::1,40349564,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+40349564::location_cg_so::0,40349564,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+40349564::location_cg_so::1,40349564,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+40349564::location_fg_fo::0,40349564,location_fg_fo,2,3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness"
+40349564::location_fg_fo::1,40349564,location_fg_fo,1,3,neatly hanging on a hook,3,on a hook,3,neatly hanging on a hook,3,on a hook in the laundry,3,on a hook in the laundry
+40349564::location_fg_fo::2,40349564,location_fg_fo,2,2,"in a dusty box, deep within the confines of darkness in the basement storage room",3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",2,"in the basement storage room, specifically stashed in a dusty box deep within the confines of darkness",2,"in the basement storage room, specifically stashed in a dusty box deep within the confines of darkness"
+40349564::location_fg_fo::3,40349564,location_fg_fo,2,3,"in a dusty box, deep within the confines of darkness",2,in a dusty box in the basement storage room,3,"in a dusty box, deep within the confines of darkness",2,"in the basement storage room, stashed in a dusty box",2,"in the basement storage room, stashed in a dusty box"
+40349564::location_fg_so::0,40349564,location_fg_so,1,3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",2,"in the basement storage room, specifically in a dusty box deep within the confines of darkness",2,"in the basement storage room, specifically in a dusty box deep within the confines of darkness"
+40349564::location_fg_so::1,40349564,location_fg_so,2,3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",3,"in a dusty box, deep within the confines of darkness",2,"in the basement storage room, specifically stashed in a dusty box deep within the confines of darkness",2,"in the basement storage room, specifically stashed in a dusty box deep within the confines of darkness"
+40349564::multihop_fo::0,40349564,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+40349564::multihop_fo::1,40349564,multihop_fo_fullness,1,1,less full,1,less full,1,less full,-1,unknown,-1,unknown
+40349564::multihop_fo::2,40349564,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+40349564::multihop_fo::3,40349564,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+40349564::multihop_fo::4,40349564,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+40349564::multihop_fo::5,40349564,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+40349564::multihop_so::0,40349564,multihop_so_fullness,1,1,less full,1,less full,1,less full,-1,unknown,-1,unknown
+40349564::multihop_so::1,40349564,multihop_so_fullness,1,1,less full,1,less full,1,less full,-1,unknown,-1,unknown
+40349564::multihop_so::2,40349564,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+40349564::multihop_so::3,40349564,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+40349564::multihop_so::4,40349564,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+40349564::multihop_so::5,40349564,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+40349564::attitude::0,40349564,attitude,2,2,negative,2,negative,2,negative,2,negative,2,negative
+43999533::location_cg_fo::0,43999533,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+43999533::location_cg_fo::1,43999533,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+43999533::location_cg_so::0,43999533,location_cg_so,0,1,Yes,0,No,0,No,0,No,0,No
+43999533::location_cg_so::1,43999533,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+43999533::location_fg_fo::0,43999533,location_fg_fo,2,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator
+43999533::location_fg_fo::1,43999533,location_fg_fo,1,3,among the forgotten trinkets in the dusty cupboards of the crawlspace,3,among the forgotten trinkets in the dusty cupboards of the crawlspace,3,in the crawlspace of their shared apartment,3,in the crawlspace of their shared apartment,3,in the crawlspace of their shared apartment
+43999533::location_fg_fo::2,43999533,location_fg_fo,2,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator
+43999533::location_fg_fo::3,43999533,location_fg_fo,2,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator
+43999533::location_fg_so::0,43999533,location_fg_so,2,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator
+43999533::location_fg_so::1,43999533,location_fg_so,2,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator,2,in the refrigerator
+43999533::multihop_fo::0,43999533,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+43999533::multihop_fo::1,43999533,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+43999533::multihop_fo::2,43999533,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+43999533::multihop_fo::3,43999533,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+43999533::multihop_fo::4,43999533,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+43999533::multihop_fo::5,43999533,multihop_fo_accessibility,1,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+43999533::multihop_so::0,43999533,multihop_so_fullness,1,1,less full,1,less full,1,less full,3,equally full,1,less full
+43999533::multihop_so::1,43999533,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+43999533::multihop_so::2,43999533,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+43999533::multihop_so::3,43999533,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+43999533::multihop_so::4,43999533,multihop_so_accessibility,1,1,more accessible,2,less accessible,1,more accessible,1,more accessible,1,more accessible
+43999533::multihop_so::5,43999533,multihop_so_accessibility,1,2,less accessible,2,less accessible,2,less accessible,1,more accessible,2,less accessible
+43999533::attitude::0,43999533,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+86737383::location_cg_fo::0,86737383,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+86737383::location_cg_fo::1,86737383,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+86737383::location_cg_so::0,86737383,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+86737383::location_cg_so::1,86737383,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+86737383::location_fg_fo::0,86737383,location_fg_fo,2,3,a higher shelf,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf
+86737383::location_fg_fo::1,86737383,location_fg_fo,1,3,in the corner,1,in a cupboard tucked away in the corner,3,in the basement,1,in a cupboard in the basement,1,in a cupboard in the basement
+86737383::location_fg_fo::2,86737383,location_fg_fo,2,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf
+86737383::location_fg_fo::3,86737383,location_fg_fo,2,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf
+86737383::location_fg_so::0,86737383,location_fg_so,1,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,1,in the cupboard,1,in the cupboard
+86737383::location_fg_so::1,86737383,location_fg_so,2,3,on a higher shelf,3,on a higher shelf,3,on a higher shelf,3,a higher shelf,3,a higher shelf
+86737383::multihop_fo::0,86737383,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_fo::1,86737383,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_fo::2,86737383,multihop_fo_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_fo::3,86737383,multihop_fo_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_fo::4,86737383,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+86737383::multihop_fo::5,86737383,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+86737383::multihop_so::0,86737383,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_so::1,86737383,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_so::2,86737383,multihop_so_fullness,2,1,less full,1,less full,1,less full,1,less full,2,more full
+86737383::multihop_so::3,86737383,multihop_so_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+86737383::multihop_so::4,86737383,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+86737383::multihop_so::5,86737383,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+86737383::attitude::0,86737383,attitude,2,2,negative,2,negative,2,negative,2,negative,2,negative
+51542436::location_cg_fo::0,51542436,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+51542436::location_cg_fo::1,51542436,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+51542436::location_cg_so::0,51542436,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+51542436::location_cg_so::1,51542436,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+51542436::location_fg_fo::0,51542436,location_fg_fo,2,2,on the office table,2,on the center of the office table,2,on the office table,2,on the office table,2,on the office table
+51542436::location_fg_fo::1,51542436,location_fg_fo,1,1,in the bathtub,1,in the bathtub,1,in the bathtub,1,in the bathtub,1,in the bathtub
+51542436::location_fg_fo::2,51542436,location_fg_fo,2,2,on the center of the office table,2,on the center of the office table,2,on the center of the office table,2,on the office table,2,on the office table
+51542436::location_fg_fo::3,51542436,location_fg_fo,1,1,in the bathtub,1,in the bathtub,1,in the bathtub,1,in the bathtub,1,in the bathtub
+51542436::location_fg_so::0,51542436,location_fg_so,2,1,in the bathtub,1,in the bathtub,1,in the bathtub,1,in the bathtub,1,in the bathtub
+51542436::location_fg_so::1,51542436,location_fg_so,1,1,in the bathtub,2,on the center of the office table,2,the center of the office table,2,on the center of the office table,2,on the center of the office table
+51542436::multihop_fo::0,51542436,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+51542436::multihop_fo::1,51542436,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+51542436::multihop_fo::2,51542436,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+51542436::multihop_fo::3,51542436,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+51542436::multihop_fo::4,51542436,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+51542436::multihop_fo::5,51542436,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+51542436::multihop_so::0,51542436,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,3,equally full
+51542436::multihop_so::1,51542436,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+51542436::multihop_so::2,51542436,multihop_so_fullness,2,2,more full,1,less full,2,more full,2,more full,1,less full
+51542436::multihop_so::3,51542436,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+51542436::multihop_so::4,51542436,multihop_so_accessibility,1,1,more accessible,2,less accessible,1,more accessible,1,more accessible,1,more accessible
+51542436::multihop_so::5,51542436,multihop_so_accessibility,3,2,less accessible,2,less accessible,1,more accessible,1,more accessible,1,more accessible
+51542436::attitude::0,51542436,attitude,2,2,negative,2,negative,2,negative,2,negative,2,negative
+10197775::location_cg_fo::0,10197775,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+10197775::location_cg_fo::1,10197775,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+10197775::location_cg_so::0,10197775,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+10197775::location_cg_so::1,10197775,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+10197775::location_fg_fo::0,10197775,location_fg_fo,2,2,center of the table,2,center of the table,2,center of the table,2,center of the table,2,center of the table
+10197775::location_fg_fo::1,10197775,location_fg_fo,1,1,inside a suitcase,1,inside a suitcase,1,inside a suitcase,1,inside a suitcase,1,inside a suitcase
+10197775::location_fg_fo::2,10197775,location_fg_fo,2,2,center of the table,2,center of the table,2,the center of the table,2,at the center of the table,2,at the center of the table
+10197775::location_fg_fo::3,10197775,location_fg_fo,1,2,center of the table,2,in the center of the table,2,the center of the table,2,the center of the table,2,the center of the table
+10197775::location_fg_so::0,10197775,location_fg_so,1,2,the center of the table,2,center of the table,2,the center of the table,2,at the center of the table,2,at the center of the table
+10197775::location_fg_so::1,10197775,location_fg_so,1,2,the center of the table,2,center of the table,2,the center of the table,2,at the center of the table,2,at the center of the table
+10197775::multihop_fo::0,10197775,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+10197775::multihop_fo::1,10197775,multihop_fo_fullness,3,1,less full,1,less full,1,less full,3,equally full,3,equally full
+10197775::multihop_fo::2,10197775,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+10197775::multihop_fo::3,10197775,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+10197775::multihop_fo::4,10197775,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+10197775::multihop_fo::5,10197775,multihop_fo_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+10197775::multihop_so::0,10197775,multihop_so_fullness,3,2,more full,1,less full,1,less full,3,equally full,1,less full
+10197775::multihop_so::1,10197775,multihop_so_fullness,3,1,less full,1,less full,1,less full,3,equally full,1,less full
+10197775::multihop_so::2,10197775,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+10197775::multihop_so::3,10197775,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+10197775::multihop_so::4,10197775,multihop_so_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+10197775::multihop_so::5,10197775,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+10197775::attitude::0,10197775,attitude,1,1,positive,1,positive,1,positive,3,neutral,3,neutral
+44119117::location_cg_fo::0,44119117,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+44119117::location_cg_fo::1,44119117,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+44119117::location_cg_so::0,44119117,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+44119117::location_cg_so::1,44119117,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+44119117::location_fg_fo::0,44119117,location_fg_fo,2,2,nearby donation bin,2,in a nearby donation bin,2,nearby donation bin,2,in the donation bin,2,in the donation bin
+44119117::location_fg_fo::1,44119117,location_fg_fo,1,3,on a shelf,1,in a glass bottle sitting on a shelf,1,in a glass bottle sitting on a shelf,1,in a glass bottle on a shelf in the dusty attic,1,in a glass bottle on a shelf in the dusty attic
+44119117::location_fg_fo::2,44119117,location_fg_fo,2,2,nearby donation bin,2,in a nearby donation bin,2,in a nearby donation bin,2,nearby donation bin,2,nearby donation bin
+44119117::location_fg_fo::3,44119117,location_fg_fo,2,2,in a nearby donation bin,2,in a nearby donation bin,2,in a nearby donation bin,2,in the donation bin,2,in the donation bin
+44119117::location_fg_so::0,44119117,location_fg_so,1,2,in the donation bin,2,in the donation bin,2,in the donation bin,3,unknown,3,unknown
+44119117::location_fg_so::1,44119117,location_fg_so,2,2,nearby donation bin,2,in a nearby donation bin,2,in a nearby donation bin,2,the nearby donation bin,2,the nearby donation bin
+44119117::multihop_fo::0,44119117,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+44119117::multihop_fo::1,44119117,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+44119117::multihop_fo::2,44119117,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+44119117::multihop_fo::3,44119117,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+44119117::multihop_fo::4,44119117,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+44119117::multihop_fo::5,44119117,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+44119117::multihop_so::0,44119117,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+44119117::multihop_so::1,44119117,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+44119117::multihop_so::2,44119117,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+44119117::multihop_so::3,44119117,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+44119117::multihop_so::4,44119117,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+44119117::multihop_so::5,44119117,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+44119117::attitude::0,44119117,attitude,1,1,positive,1,positive,1,positive,1,positive,1,positive
+12976242::location_cg_fo::0,12976242,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+12976242::location_cg_fo::1,12976242,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+12976242::location_cg_so::0,12976242,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+12976242::location_cg_so::1,12976242,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+12976242::location_fg_fo::0,12976242,location_fg_fo,2,2,center of the table,2,center of the table,2,the center of the table,2,the center of the table,2,the center of the table
+12976242::location_fg_fo::1,12976242,location_fg_fo,1,3,its original spot,3,in the sunroom,3,in the sunroom,3,in the sunroom,3,in the sunroom
+12976242::location_fg_fo::2,12976242,location_fg_fo,2,2,the center of the table,2,the center of the table,2,the center of the table,2,at the center of the table,2,at the center of the table
+12976242::location_fg_fo::3,12976242,location_fg_fo,1,2,the center of the table,2,the center of the table,2,the center of the table,2,in the center of the table,2,in the center of the table
+12976242::location_fg_so::0,12976242,location_fg_so,1,2,the center of the table,2,the center of the table,2,the center of the table,3,in the sunroom,3,in the sunroom
+12976242::location_fg_so::1,12976242,location_fg_so,1,2,the center of the table,2,the center of the table,2,the center of the table,2,at the center of the table,2,at the center of the table
+12976242::multihop_fo::0,12976242,multihop_fo_fullness,1,3,equally full,3,equally full,3,equally full,3,equally full,3,equally full
+12976242::multihop_fo::1,12976242,multihop_fo_fullness,3,3,equally full,3,equally full,3,equally full,3,equally full,3,equally full
+12976242::multihop_fo::2,12976242,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+12976242::multihop_fo::3,12976242,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+12976242::multihop_fo::4,12976242,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+12976242::multihop_fo::5,12976242,multihop_fo_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+12976242::multihop_so::0,12976242,multihop_so_fullness,3,2,more full,3,equally full,2,more full,1,less full,2,more full
+12976242::multihop_so::1,12976242,multihop_so_fullness,3,2,more full,2,more full,2,more full,3,equally full,1,less full
+12976242::multihop_so::2,12976242,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+12976242::multihop_so::3,12976242,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+12976242::multihop_so::4,12976242,multihop_so_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+12976242::multihop_so::5,12976242,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+12976242::attitude::0,12976242,attitude,1,3,neutral,1,positive,3,neutral,3,neutral,3,neutral
+36735830::location_cg_fo::0,36735830,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+36735830::location_cg_fo::1,36735830,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+36735830::location_cg_so::0,36735830,location_cg_so,1,1,Yes,1,Yes,1,Yes,1,Yes,1,Yes
+36735830::location_cg_so::1,36735830,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+36735830::location_fg_fo::0,36735830,location_fg_fo,2,2,in the drawer in his office,2,in the drawer in his office,2,in the drawer in his office,2,in Owen's office drawer,2,in Owen's office drawer
+36735830::location_fg_fo::1,36735830,location_fg_fo,1,1,in the pantry in the patio,1,in the pantry in the patio,1,in the pantry in the patio,1,in the pantry in the patio,1,in the pantry in the patio
+36735830::location_fg_fo::2,36735830,location_fg_fo,2,2,in the drawer in his office,2,in the drawer in his office,2,in the drawer in his office,2,in his office drawer,2,in his office drawer
+36735830::location_fg_fo::3,36735830,location_fg_fo,1,2,in the drawer in his office,2,in the drawer in his office,2,in the drawer in his office,2,in the drawer in Owen's office,2,in the drawer in Owen's office
+36735830::location_fg_so::0,36735830,location_fg_so,1,1,pantry,1,pantry,1,pantry,1,the pantry,1,the pantry
+36735830::location_fg_so::1,36735830,location_fg_so,1,2,in the drawer in his office,2,in the drawer in his office,2,in his office,2,in his office drawer,2,in his office drawer
+36735830::multihop_fo::0,36735830,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+36735830::multihop_fo::1,36735830,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+36735830::multihop_fo::2,36735830,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+36735830::multihop_fo::3,36735830,multihop_fo_fullness,3,2,more full,2,more full,2,more full,1,less full,1,less full
+36735830::multihop_fo::4,36735830,multihop_fo_accessibility,2,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+36735830::multihop_fo::5,36735830,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,3,equally accessible
+36735830::multihop_so::0,36735830,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+36735830::multihop_so::1,36735830,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+36735830::multihop_so::2,36735830,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+36735830::multihop_so::3,36735830,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+36735830::multihop_so::4,36735830,multihop_so_accessibility,1,1,more accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+36735830::multihop_so::5,36735830,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+36735830::attitude::0,36735830,attitude,2,2,negative,2,negative,3,neutral,2,negative,2,negative
+78394024::location_cg_fo::0,78394024,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+78394024::location_cg_fo::1,78394024,location_cg_fo,1,1,Yes,0,No,0,No,0,No,0,No
+78394024::location_cg_so::0,78394024,location_cg_so,0,1,Yes,1,Yes,1,Yes,0,No,0,No
+78394024::location_cg_so::1,78394024,location_cg_so,1,1,Yes,0,No,0,No,0,No,0,No
+78394024::location_fg_fo::0,78394024,location_fg_fo,2,2,in the nearby trash can,2,in the nearby trash can,2,in the nearby trash can,2,in the trash can,2,in the trash can
+78394024::location_fg_fo::1,78394024,location_fg_fo,1,1,in a basket,1,in a basket,1,in a basket,1,in a basket,1,in a basket
+78394024::location_fg_fo::2,78394024,location_fg_fo,2,2,in the nearby trash can,2,in the nearby trash can,2,in the nearby trash can,2,in the trash can,2,in the trash can
+78394024::location_fg_fo::3,78394024,location_fg_fo,1,2,in the trash can,3,in the sunroom,2,in the trash can,3,in the sunroom,3,in the sunroom
+78394024::location_fg_so::0,78394024,location_fg_so,2,3,in the sunroom,1,in a basket,1,in a basket,3,unknown,3,unknown
+78394024::location_fg_so::1,78394024,location_fg_so,1,2,nearby trash can,2,nearby trash can,2,in the nearby trash can,3,in the sunroom,3,in the sunroom
+78394024::multihop_fo::0,78394024,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+78394024::multihop_fo::1,78394024,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+78394024::multihop_fo::2,78394024,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+78394024::multihop_fo::3,78394024,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+78394024::multihop_fo::4,78394024,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+78394024::multihop_fo::5,78394024,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,3,equally accessible
+78394024::multihop_so::0,78394024,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+78394024::multihop_so::1,78394024,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+78394024::multihop_so::2,78394024,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+78394024::multihop_so::3,78394024,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+78394024::multihop_so::4,78394024,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+78394024::multihop_so::5,78394024,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+78394024::attitude::0,78394024,attitude,1,2,negative,2,negative,2,negative,2,negative,2,negative
+13369720::location_cg_fo::0,13369720,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+13369720::location_cg_fo::1,13369720,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+13369720::location_cg_so::0,13369720,location_cg_so,1,1,Yes,0,No,0,No,0,No,0,No
+13369720::location_cg_so::1,13369720,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+13369720::location_fg_fo::0,13369720,location_fg_fo,2,2,in the closet,2,in the closet,2,in the closet,2,in the closet,2,in the closet
+13369720::location_fg_fo::1,13369720,location_fg_fo,1,3,on the kitchen counter,1,in an open suitcase on the kitchen counter,1,in an open suitcase on the kitchen counter,1,in an open suitcase on the kitchen counter,1,in an open suitcase on the kitchen counter
+13369720::location_fg_fo::2,13369720,location_fg_fo,2,2,in the closet,2,in the closet,2,in the closet,2,in the closet,2,in the closet
+13369720::location_fg_fo::3,13369720,location_fg_fo,2,2,in the closet,2,in the closet,2,in the closet,2,in the closet,2,in the closet
+13369720::location_fg_so::0,13369720,location_fg_so,1,2,in the closet,2,in the closet,2,in the closet,2,in the closet,2,in the closet
+13369720::location_fg_so::1,13369720,location_fg_so,2,2,in the closet,2,in the closet,2,in the closet,2,in the closet,2,in the closet
+13369720::multihop_fo::0,13369720,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+13369720::multihop_fo::1,13369720,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+13369720::multihop_fo::2,13369720,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13369720::multihop_fo::3,13369720,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13369720::multihop_fo::4,13369720,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+13369720::multihop_fo::5,13369720,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+13369720::multihop_so::0,13369720,multihop_so_fullness,3,2,more full,1,less full,1,less full,1,less full,1,less full
+13369720::multihop_so::1,13369720,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+13369720::multihop_so::2,13369720,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+13369720::multihop_so::3,13369720,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13369720::multihop_so::4,13369720,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+13369720::multihop_so::5,13369720,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+13369720::attitude::0,13369720,attitude,3,1,positive,2,negative,1,positive,3,neutral,3,neutral
+48498937::location_cg_fo::0,48498937,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+48498937::location_cg_fo::1,48498937,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+48498937::location_cg_so::0,48498937,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+48498937::location_cg_so::1,48498937,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+48498937::location_fg_fo::0,48498937,location_fg_fo,2,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge
+48498937::location_fg_fo::1,48498937,location_fg_fo,1,3,in the corner of the room,3,in the master bedroom,3,in the master bedroom,3,in the master bedroom,3,in the master bedroom
+48498937::location_fg_fo::2,48498937,location_fg_fo,2,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge
+48498937::location_fg_fo::3,48498937,location_fg_fo,1,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge
+48498937::location_fg_so::0,48498937,location_fg_so,1,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge,3,kitchen
+48498937::location_fg_so::1,48498937,location_fg_so,1,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge,2,in the fridge
+48498937::multihop_fo::0,48498937,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+48498937::multihop_fo::1,48498937,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+48498937::multihop_fo::2,48498937,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+48498937::multihop_fo::3,48498937,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+48498937::multihop_fo::4,48498937,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+48498937::multihop_fo::5,48498937,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+48498937::multihop_so::0,48498937,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+48498937::multihop_so::1,48498937,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+48498937::multihop_so::2,48498937,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+48498937::multihop_so::3,48498937,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+48498937::multihop_so::4,48498937,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+48498937::multihop_so::5,48498937,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+48498937::attitude::0,48498937,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+88535842::location_cg_fo::0,88535842,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+88535842::location_cg_fo::1,88535842,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+88535842::location_cg_so::0,88535842,location_cg_so,1,1,Yes,1,Yes,1,Yes,1,Yes,1,Yes
+88535842::location_cg_so::1,88535842,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+88535842::location_fg_fo::0,88535842,location_fg_fo,2,2,unused room,2,in an unused room,2,in an unused room,2,in an unused room,2,in an unused room
+88535842::location_fg_fo::1,88535842,location_fg_fo,1,1,inside a glass bottle,1,inside a glass bottle,1,inside a glass bottle,1,inside a glass bottle on the patio,1,inside a glass bottle on the patio
+88535842::location_fg_fo::2,88535842,location_fg_fo,2,2,an unused room,2,in an unused room,2,an unused room,2,an unused room,2,an unused room
+88535842::location_fg_fo::3,88535842,location_fg_fo,1,2,in an unused room,2,in an unused room,2,in an unused room,3,Hannah does not know the precise location of the skirt by the end of the story.,3,Hannah does not know the precise location of the skirt by the end of the story.
+88535842::location_fg_so::0,88535842,location_fg_so,1,2,in an unused room,2,in an unused room,2,in an unused room,3,the patio,2,in an unused room
+88535842::location_fg_so::1,88535842,location_fg_so,1,2,an unused room,2,an unused room,2,an unused room,3,Hannah does not know where Andy thinks the skirt is located by the end of the story.,3,Hannah does not know where Andy thinks the skirt is located by the end of the story.
+88535842::multihop_fo::0,88535842,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+88535842::multihop_fo::1,88535842,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+88535842::multihop_fo::2,88535842,multihop_fo_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+88535842::multihop_fo::3,88535842,multihop_fo_fullness,3,1,less full,1,less full,1,less full,3,equally full,3,equally full
+88535842::multihop_fo::4,88535842,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+88535842::multihop_fo::5,88535842,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+88535842::multihop_so::0,88535842,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+88535842::multihop_so::1,88535842,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+88535842::multihop_so::2,88535842,multihop_so_fullness,3,1,less full,1,less full,1,less full,2,more full,2,more full
+88535842::multihop_so::3,88535842,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+88535842::multihop_so::4,88535842,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+88535842::multihop_so::5,88535842,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+88535842::attitude::0,88535842,attitude,1,2,negative,3,neutral,2,negative,2,negative,2,negative
+62157313::location_cg_fo::0,62157313,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+62157313::location_cg_fo::1,62157313,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+62157313::location_cg_so::0,62157313,location_cg_so,0,1,Yes,1,Yes,0,No,0,No,1,Yes
+62157313::location_cg_so::1,62157313,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+62157313::location_fg_fo::0,62157313,location_fg_fo,2,2,mannequin room,2,mannequin room,2,mannequin room,2,in the mannequin room,2,in the mannequin room
+62157313::location_fg_fo::1,62157313,location_fg_fo,1,1,in a bucket,1,in a bucket,1,in a bucket,2,in the dining room,2,in the dining room
+62157313::location_fg_fo::2,62157313,location_fg_fo,2,2,mannequin room,2,mannequin room,2,the mannequin room,2,the mannequin room,2,the mannequin room
+62157313::location_fg_fo::3,62157313,location_fg_fo,1,2,mannequin room,2,mannequin room,2,mannequin room,3,unknown,3,unknown
+62157313::location_fg_so::0,62157313,location_fg_so,2,2,the dining room,2,in the mannequin room,2,in the mannequin room,2,the mannequin room,2,the dining room
+62157313::location_fg_so::1,62157313,location_fg_so,1,2,mannequin room,2,the mannequin room,2,the mannequin room,2,in the mannequin room,2,in the mannequin room
+62157313::multihop_fo::0,62157313,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+62157313::multihop_fo::1,62157313,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+62157313::multihop_fo::2,62157313,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+62157313::multihop_fo::3,62157313,multihop_fo_fullness,3,2,more full,2,more full,2,more full,1,less full,1,less full
+62157313::multihop_fo::4,62157313,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+62157313::multihop_fo::5,62157313,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+62157313::multihop_so::0,62157313,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,3,equally full
+62157313::multihop_so::1,62157313,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+62157313::multihop_so::2,62157313,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+62157313::multihop_so::3,62157313,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+62157313::multihop_so::4,62157313,multihop_so_accessibility,1,1,more accessible,2,less accessible,2,less accessible,2,less accessible,1,more accessible
+62157313::multihop_so::5,62157313,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+62157313::attitude::0,62157313,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+82931048::location_cg_fo::0,82931048,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+82931048::location_cg_fo::1,82931048,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+82931048::location_cg_so::0,82931048,location_cg_so,1,1,Yes,1,Yes,1,Yes,0,No,0,No
+82931048::location_cg_so::1,82931048,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+82931048::location_fg_fo::0,82931048,location_fg_fo,2,2,in her own closet,2,in Kylie's closet,2,in her own closet,2,in Kylie's closet,2,in Kylie's closet
+82931048::location_fg_fo::1,82931048,location_fg_fo,1,3,in the corner,3,in the corner,3,in the corner,1,in a crate,1,in a crate
+82931048::location_fg_fo::2,82931048,location_fg_fo,2,2,in her own closet,2,in her own closet,2,in her own closet,2,in her closet,2,in her closet
+82931048::location_fg_fo::3,82931048,location_fg_fo,1,2,in Kylie's closet,2,in Kylie's closet,2,in Kylie's closet,3,unknown,3,unknown
+82931048::location_fg_so::0,82931048,location_fg_so,1,2,in her own closet,2,in her own closet,2,in her own closet,1,in the crate,2,in her closet
+82931048::location_fg_so::1,82931048,location_fg_so,1,2,in her own closet,2,in her own closet,2,in her own closet,2,in her own closet,2,in her own closet
+82931048::multihop_fo::0,82931048,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+82931048::multihop_fo::1,82931048,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+82931048::multihop_fo::2,82931048,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+82931048::multihop_fo::3,82931048,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+82931048::multihop_fo::4,82931048,multihop_fo_accessibility,1,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+82931048::multihop_fo::5,82931048,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+82931048::multihop_so::0,82931048,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+82931048::multihop_so::1,82931048,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+82931048::multihop_so::2,82931048,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+82931048::multihop_so::3,82931048,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+82931048::multihop_so::4,82931048,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+82931048::multihop_so::5,82931048,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+82931048::attitude::0,82931048,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+74447435::location_cg_fo::0,74447435,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+74447435::location_cg_fo::1,74447435,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+74447435::location_cg_so::0,74447435,location_cg_so,1,1,Yes,1,Yes,1,Yes,0,No,0,No
+74447435::location_cg_so::1,74447435,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+74447435::location_fg_fo::0,74447435,location_fg_fo,2,2,Oscar's refrigerator,2,Oscar's refrigerator,2,Oscar's refrigerator,2,Oscar's refrigerator,2,Oscar's refrigerator
+74447435::location_fg_fo::1,74447435,location_fg_fo,1,1,in the pantry,1,in the pantry,1,in the pantry,1,in the pantry,1,in the pantry
+74447435::location_fg_fo::2,74447435,location_fg_fo,2,2,Oscar's refrigerator,2,Oscar's refrigerator,2,Oscar's refrigerator,2,in his own refrigerator,2,in his own refrigerator
+74447435::location_fg_fo::3,74447435,location_fg_fo,1,2,Oscar's refrigerator,2,in Oscar's refrigerator,2,in Oscar's refrigerator,3,unknown,3,unknown
+74447435::location_fg_so::0,74447435,location_fg_so,1,3,the basement,3,the basement,3,the basement,3,the basement,3,the basement
+74447435::location_fg_so::1,74447435,location_fg_so,1,2,his own refrigerator,2,Oscar's refrigerator,2,Oscar's own refrigerator,2,Oscar's refrigerator,2,Oscar's refrigerator
+74447435::multihop_fo::0,74447435,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+74447435::multihop_fo::1,74447435,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+74447435::multihop_fo::2,74447435,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+74447435::multihop_fo::3,74447435,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+74447435::multihop_fo::4,74447435,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+74447435::multihop_fo::5,74447435,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+74447435::multihop_so::0,74447435,multihop_so_fullness,3,2,more full,1,less full,1,less full,1,less full,1,less full
+74447435::multihop_so::1,74447435,multihop_so_fullness,3,2,more full,1,less full,1,less full,1,less full,1,less full
+74447435::multihop_so::2,74447435,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+74447435::multihop_so::3,74447435,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+74447435::multihop_so::4,74447435,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+74447435::multihop_so::5,74447435,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+74447435::attitude::0,74447435,attitude,2,2,negative,2,negative,2,negative,2,negative,2,negative
+25192217::location_cg_fo::0,25192217,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+25192217::location_cg_fo::1,25192217,location_cg_fo,1,1,Yes,0,No,0,No,0,No,0,No
+25192217::location_cg_so::0,25192217,location_cg_so,0,1,Yes,1,Yes,0,No,0,No,0,No
+25192217::location_cg_so::1,25192217,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+25192217::location_fg_fo::0,25192217,location_fg_fo,2,2,the pantry,2,the pantry,2,the pantry,2,in the pantry,2,in the pantry
+25192217::location_fg_fo::1,25192217,location_fg_fo,1,1,"in the old, chipped bathtub",1,"in the old, chipped bathtub",3,in the cellar,3,cellar,3,cellar
+25192217::location_fg_fo::2,25192217,location_fg_fo,2,2,the pantry,2,the pantry,2,the pantry,2,in the pantry,2,in the pantry
+25192217::location_fg_fo::3,25192217,location_fg_fo,1,2,in the pantry,2,In the pantry,2,in the pantry,2,in the pantry,2,in the pantry
+25192217::location_fg_so::0,25192217,location_fg_so,2,2,in the pantry,2,In the pantry,2,in the pantry,2,the pantry,3,the cellar
+25192217::location_fg_so::1,25192217,location_fg_so,1,2,the pantry,2,the pantry,2,the pantry,2,in the pantry,2,in the pantry
+25192217::multihop_fo::0,25192217,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+25192217::multihop_fo::1,25192217,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+25192217::multihop_fo::2,25192217,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+25192217::multihop_fo::3,25192217,multihop_fo_fullness,3,2,more full,2,more full,1,less full,2,more full,2,more full
+25192217::multihop_fo::4,25192217,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+25192217::multihop_fo::5,25192217,multihop_fo_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+25192217::multihop_so::0,25192217,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+25192217::multihop_so::1,25192217,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+25192217::multihop_so::2,25192217,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,1,less full
+25192217::multihop_so::3,25192217,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+25192217::multihop_so::4,25192217,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+25192217::multihop_so::5,25192217,multihop_so_accessibility,3,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+25192217::attitude::0,25192217,attitude,1,2,negative,2,negative,2,negative,2,negative,2,negative
+38709379::location_cg_fo::0,38709379,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+38709379::location_cg_fo::1,38709379,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+38709379::location_cg_so::0,38709379,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+38709379::location_cg_so::1,38709379,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+38709379::location_fg_fo::0,38709379,location_fg_fo,2,2,in a storage unit,2,in a storage unit,2,in a storage unit,2,in a storage unit,2,in a storage unit
+38709379::location_fg_fo::1,38709379,location_fg_fo,1,3,in the corner,3,in the corner,3,in the corner,3,in the corner,3,in the corner
+38709379::location_fg_fo::2,38709379,location_fg_fo,2,2,in a storage unit,2,in a storage unit,2,in a storage unit,2,in the storage unit,2,in the storage unit
+38709379::location_fg_fo::3,38709379,location_fg_fo,2,2,in a storage unit,2,in a storage unit,2,in a storage unit,2,in the storage unit,2,in the storage unit
+38709379::location_fg_so::0,38709379,location_fg_so,2,2,in the storage unit,2,in a storage unit,3,in the corner,2,in the storage unit,2,in the storage unit
+38709379::location_fg_so::1,38709379,location_fg_so,2,2,in a storage unit,2,in a storage unit,2,in a storage unit,2,in the storage unit,2,in the storage unit
+38709379::multihop_fo::0,38709379,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_fo::1,38709379,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_fo::2,38709379,multihop_fo_fullness,2,1,less full,1,less full,1,less full,2,more full,2,more full
+38709379::multihop_fo::3,38709379,multihop_fo_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_fo::4,38709379,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+38709379::multihop_fo::5,38709379,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+38709379::multihop_so::0,38709379,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_so::1,38709379,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_so::2,38709379,multihop_so_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_so::3,38709379,multihop_so_fullness,2,1,less full,1,less full,1,less full,1,less full,1,less full
+38709379::multihop_so::4,38709379,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+38709379::multihop_so::5,38709379,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+38709379::attitude::0,38709379,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+13366612::location_cg_fo::0,13366612,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+13366612::location_cg_fo::1,13366612,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+13366612::location_cg_so::0,13366612,location_cg_so,1,1,Yes,1,Yes,1,Yes,1,Yes,0,No
+13366612::location_cg_so::1,13366612,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+13366612::location_fg_fo::0,13366612,location_fg_fo,2,2,Hunter's bedroom,2,Hunter's bedroom,2,Hunter's bedroom,2,Hunter's bedroom,2,Hunter's bedroom
+13366612::location_fg_fo::1,13366612,location_fg_fo,1,1,in the treasure chest,1,in the treasure chest,1,in the treasure chest,1,in the treasure chest,1,in the treasure chest
+13366612::location_fg_fo::2,13366612,location_fg_fo,2,2,Hunter's bedroom,2,Hunter's bedroom,2,in Hunter's bedroom,2,in Hunter's bedroom,2,in Hunter's bedroom
+13366612::location_fg_fo::3,13366612,location_fg_fo,1,2,Hunter's bedroom,2,in Hunter's bedroom,1,in the treasure chest,2,Hunter's bedroom,2,Hunter's bedroom
+13366612::location_fg_so::0,13366612,location_fg_so,1,1,in the treasure chest,1,in the treasure chest,1,in the treasure chest,1,the treasure chest,1,the treasure chest
+13366612::location_fg_so::1,13366612,location_fg_so,1,2,Hunter's bedroom,2,Hunter's bedroom,2,Hunter's bedroom,2,in his own bedroom,2,in his own bedroom
+13366612::multihop_fo::0,13366612,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+13366612::multihop_fo::1,13366612,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+13366612::multihop_fo::2,13366612,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13366612::multihop_fo::3,13366612,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+13366612::multihop_fo::4,13366612,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+13366612::multihop_fo::5,13366612,multihop_fo_accessibility,3,1,more accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+13366612::multihop_so::0,13366612,multihop_so_fullness,1,1,less full,1,less full,1,less full,3,equally full,1,less full
+13366612::multihop_so::1,13366612,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+13366612::multihop_so::2,13366612,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+13366612::multihop_so::3,13366612,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+13366612::multihop_so::4,13366612,multihop_so_accessibility,1,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+13366612::multihop_so::5,13366612,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+13366612::attitude::0,13366612,attitude,3,2,negative,2,negative,2,negative,2,negative,2,negative
+48727468::location_cg_fo::0,48727468,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+48727468::location_cg_fo::1,48727468,location_cg_fo,1,0,No,0,No,0,No,0,No,0,No
+48727468::location_cg_so::0,48727468,location_cg_so,1,1,Yes,1,Yes,1,Yes,1,Yes,1,Yes
+48727468::location_cg_so::1,48727468,location_cg_so,1,1,Yes,0,No,0,No,0,No,0,No
+48727468::location_fg_fo::0,48727468,location_fg_fo,2,2,Rory's kitchen counter,2,Rory's kitchen counter,2,on his kitchen counter,2,on Rory's kitchen counter,2,on Rory's kitchen counter
+48727468::location_fg_fo::1,48727468,location_fg_fo,1,1,in a container,1,in a container,1,in a container,1,in a container in the garden,1,in a container in the garden
+48727468::location_fg_fo::2,48727468,location_fg_fo,2,2,on his kitchen counter,2,on his kitchen counter,2,on his kitchen counter,2,on his kitchen counter,2,on his kitchen counter
+48727468::location_fg_fo::3,48727468,location_fg_fo,1,2,on Rory's kitchen counter,2,in Rory's kitchen counter,3,in the garden,2,in Rory's kitchen counter,2,in Rory's kitchen counter
+48727468::location_fg_so::0,48727468,location_fg_so,1,3,in the garden,3,in the garden,3,in the garden,3,in the garden,3,in the garden
+48727468::location_fg_so::1,48727468,location_fg_so,1,2,on his kitchen counter,2,Rory's kitchen counter,2,on his kitchen counter,2,on his kitchen counter,2,on his kitchen counter
+48727468::multihop_fo::0,48727468,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+48727468::multihop_fo::1,48727468,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+48727468::multihop_fo::2,48727468,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+48727468::multihop_fo::3,48727468,multihop_fo_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+48727468::multihop_fo::4,48727468,multihop_fo_accessibility,1,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+48727468::multihop_fo::5,48727468,multihop_fo_accessibility,3,1,more accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+48727468::multihop_so::0,48727468,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+48727468::multihop_so::1,48727468,multihop_so_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+48727468::multihop_so::2,48727468,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+48727468::multihop_so::3,48727468,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+48727468::multihop_so::4,48727468,multihop_so_accessibility,1,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+48727468::multihop_so::5,48727468,multihop_so_accessibility,3,1,more accessible,1,more accessible,1,more accessible,1,more accessible,1,more accessible
+48727468::attitude::0,48727468,attitude,2,2,negative,2,negative,3,neutral,2,negative,2,negative
+23953367::location_cg_fo::0,23953367,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+23953367::location_cg_fo::1,23953367,location_cg_fo,0,0,No,0,No,0,No,0,No,0,No
+23953367::location_cg_so::0,23953367,location_cg_so,1,0,No,0,No,0,No,0,No,0,No
+23953367::location_cg_so::1,23953367,location_cg_so,0,0,No,0,No,0,No,0,No,0,No
+23953367::location_fg_fo::0,23953367,location_fg_fo,2,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer
+23953367::location_fg_fo::1,23953367,location_fg_fo,1,3,in the basement,3,"in the green, leafy appearance",3,in the basement,3,unknown,3,unknown
+23953367::location_fg_fo::2,23953367,location_fg_fo,2,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer
+23953367::location_fg_fo::3,23953367,location_fg_fo,2,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer
+23953367::location_fg_so::0,23953367,location_fg_so,1,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer,2,in the freezer
+23953367::location_fg_so::1,23953367,location_fg_so,2,2,in the freezer,2,the freezer,2,in the freezer,2,in the freezer,2,in the freezer
+23953367::multihop_fo::0,23953367,multihop_fo_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+23953367::multihop_fo::1,23953367,multihop_fo_fullness,3,1,less full,1,less full,1,less full,1,less full,1,less full
+23953367::multihop_fo::2,23953367,multihop_fo_fullness,2,1,less full,2,more full,2,more full,2,more full,2,more full
+23953367::multihop_fo::3,23953367,multihop_fo_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+23953367::multihop_fo::4,23953367,multihop_fo_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+23953367::multihop_fo::5,23953367,multihop_fo_accessibility,2,2,less accessible,1,more accessible,2,less accessible,2,less accessible,2,less accessible
+23953367::multihop_so::0,23953367,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+23953367::multihop_so::1,23953367,multihop_so_fullness,1,1,less full,1,less full,1,less full,1,less full,1,less full
+23953367::multihop_so::2,23953367,multihop_so_fullness,3,2,more full,2,more full,2,more full,2,more full,2,more full
+23953367::multihop_so::3,23953367,multihop_so_fullness,2,2,more full,2,more full,2,more full,2,more full,2,more full
+23953367::multihop_so::4,23953367,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+23953367::multihop_so::5,23953367,multihop_so_accessibility,2,2,less accessible,2,less accessible,2,less accessible,2,less accessible,2,less accessible
+23953367::attitude::0,23953367,attitude,2,1,positive,1,positive,2,negative,2,negative,2,negative

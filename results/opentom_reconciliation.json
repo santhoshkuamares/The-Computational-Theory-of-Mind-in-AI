@@ -1,0 +1,57 @@
+{
+  "saved_point_estimates_reproduced": true,
+  "saved_cluster_intervals_reproduced": true,
+  "checks": [
+    {
+      "system": "base_direct",
+      "metric": "accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "base_direct",
+      "metric": "mean_family_f1",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "answer_only_direct",
+      "metric": "accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "answer_only_direct",
+      "metric": "mean_family_f1",
+      "absolute_difference": 5.551115123125783e-17
+    },
+    {
+      "system": "subjectesis_direct",
+      "metric": "accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_direct",
+      "metric": "mean_family_f1",
+      "absolute_difference": 5.551115123125783e-17
+    },
+    {
+      "system": "subjectesis_no_review",
+      "metric": "accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_no_review",
+      "metric": "mean_family_f1",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_review",
+      "metric": "accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_review",
+      "metric": "mean_family_f1",
+      "absolute_difference": 0.0
+    }
+  ],
+  "new_intervals_use_numpy_linear_quantiles": true
+}

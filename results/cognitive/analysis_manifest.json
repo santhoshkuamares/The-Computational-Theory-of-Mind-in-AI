@@ -1,0 +1,27 @@
+{
+  "analysis_type": "exploratory cognitive and representational analysis",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "base_model_changed": false,
+  "retraining_performed": false,
+  "answer_only_best_step": 1000,
+  "subjectesis_best_step": 2500,
+  "answer_only_selected_checkpoint_exposures_approx": 8000,
+  "subjectesis_selected_checkpoint_exposures_approx": 20000,
+  "probe_train_questions": 2235,
+  "probe_validation_questions": 319,
+  "probe_test_questions": 621,
+  "probe_split_unit": "dialogue",
+  "probe_input": "same plain answer-only prompt for all systems",
+  "representation": "final prompt-token hidden state from every layer including embedding output",
+  "linear_probe": "standardized logistic regression, C=1.0, class_weight=balanced",
+  "rsa_target": "benchmark-encoded belief-state geometry",
+  "counterfactual_cases": 64,
+  "counterfactual_status": "exploratory post-hoc diagnostic",
+  "interpretation_limits": [
+    "No claim of consciousness or biological equivalence.",
+    "Probe targets are benchmark-encoded variables, not independent cognitive annotations.",
+    "Adapter checkpoints differ in validation-selected training exposure.",
+    "Counterfactual diagnostic was designed after the main benchmark results and is exploratory."
+  ]
+}

@@ -1,0 +1,8 @@
+transformers==5.13.0
+peft==0.21.0
+bitsandbytes==0.49.2
+accelerate==1.12.0
+safetensors==0.8.0
+huggingface-hub==1.11.0
+tokenizers==0.22.2
+# The launch script installs torchao==0.16.0 separately with --no-deps.

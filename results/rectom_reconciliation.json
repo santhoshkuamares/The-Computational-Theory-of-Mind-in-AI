@@ -1,0 +1,107 @@
+{
+  "saved_point_estimates_reproduced": true,
+  "saved_cluster_intervals_reproduced": true,
+  "checks": [
+    {
+      "system": "base_direct",
+      "metric": "belief_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "base_direct",
+      "metric": "belief_macro_f1",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "base_direct",
+      "metric": "desire_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "base_direct",
+      "metric": "desire_macro_f1",
+      "absolute_difference": 1.1102230246251565e-16
+    },
+    {
+      "system": "answer_only_direct",
+      "metric": "belief_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "answer_only_direct",
+      "metric": "belief_macro_f1",
+      "absolute_difference": 2.220446049250313e-16
+    },
+    {
+      "system": "answer_only_direct",
+      "metric": "desire_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "answer_only_direct",
+      "metric": "desire_macro_f1",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_direct",
+      "metric": "belief_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_direct",
+      "metric": "belief_macro_f1",
+      "absolute_difference": 2.220446049250313e-16
+    },
+    {
+      "system": "subjectesis_direct",
+      "metric": "desire_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_direct",
+      "metric": "desire_macro_f1",
+      "absolute_difference": 1.1102230246251565e-16
+    },
+    {
+      "system": "subjectesis_no_review",
+      "metric": "belief_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_no_review",
+      "metric": "belief_macro_f1",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_no_review",
+      "metric": "desire_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_no_review",
+      "metric": "desire_macro_f1",
+      "absolute_difference": 1.1102230246251565e-16
+    },
+    {
+      "system": "subjectesis_review",
+      "metric": "belief_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_review",
+      "metric": "belief_macro_f1",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_review",
+      "metric": "desire_accuracy",
+      "absolute_difference": 0.0
+    },
+    {
+      "system": "subjectesis_review",
+      "metric": "desire_macro_f1",
+      "absolute_difference": 1.1102230246251565e-16
+    }
+  ],
+  "new_intervals_use_numpy_linear_quantiles": true
+}

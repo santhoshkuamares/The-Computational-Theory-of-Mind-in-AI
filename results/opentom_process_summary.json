@@ -1,0 +1,16 @@
+{
+  "right_to_right": 316,
+  "review_calls": 621,
+  "invalid_review": 0,
+  "invalid_initial": 0,
+  "wrong_to_wrong": 281,
+  "right_to_wrong": 15,
+  "wrong_to_right": 9,
+  "raw_answer_changed": 31,
+  "parsed_answer_changed": 29,
+  "initial_valid": 621,
+  "review_valid": 621,
+  "claim_changed": 220,
+  "citation_changed": 67,
+  "initial_answer_finalizer_disagreement": 174
+}

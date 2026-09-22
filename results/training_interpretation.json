@@ -1,0 +1,6 @@
+{
+  "full_schedule_exposure_matched": true,
+  "evaluated_checkpoints_exposure_matched": false,
+  "target_token_or_compute_matched": false,
+  "time_note": "Summed step_seconds includes validation/checkpoint overhead at some boundaries and cannot establish pure training time or billed wall time. Resumed duplicate step entries are not independent completed steps."
+}

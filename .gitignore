@@ -1,25 +1,16 @@
-# Python
 __pycache__/
 *.py[cod]
-.ipynb_checkpoints/
-
-# Local environments
 .venv/
-venv/
-env/
-
-# Model files and training checkpoints
+.env
+inputs/
+work/
+checkpoints/
+representations/
 *.safetensors
 *.pt
-*.pth
-checkpoints/
-adapters/
-
-# Local experiment outputs
-outputs/
-logs/
-cache/
-
-# System files
-.DS_Store
-Thumbs.db
+*.npz
+*.npy
+*.partial
+figures/*.pdf
+figures/*.svg
+results/error_casebook*

@@ -1,0 +1,36 @@
+{
+  "preparation_hashes_verified": [
+    "evaluation/test_inputs.jsonl",
+    "evaluation/validation_inputs.jsonl",
+    "manifest.json",
+    "review/all_training_records.jsonl",
+    "review/quarantined_training_records.jsonl",
+    "scoring_only/test_references.jsonl",
+    "scoring_only/validation_references.jsonl"
+  ],
+  "rectom_protocol_and_inputs_match": true,
+  "opentom_corrected_hashes_protocol_subset_and_answer_free_inputs_match": true,
+  "full_training_question_exposure_identical": true,
+  "selected_checkpoint_exposure": {
+    "ordinary": {
+      "selected_exposures": 8000,
+      "selected_unique_questions": 2091,
+      "selected_dialogues": 235
+    },
+    "subjectesis": {
+      "selected_exposures": 20000,
+      "selected_unique_questions": 2234,
+      "selected_dialogues": 235
+    }
+  },
+  "training_example_types": {
+    "ordinary": {
+      "answer_only": 30266
+    },
+    "subjectesis": {
+      "answer_only": 2235,
+      "build_state": 2235,
+      "review_state": 25796
+    }
+  }
+}

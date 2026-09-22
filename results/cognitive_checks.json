@@ -1,0 +1,18 @@
+{
+  "counterfactual": {
+    "questions": 64,
+    "pairs": 32,
+    "systems": 5,
+    "metrics_match": true
+  },
+  "process": {
+    "rectom_counts_match": true,
+    "opentom_counts_match": true
+  },
+  "representations": {
+    "split_disjoint": true,
+    "final_layer_tables_consistent": true,
+    "probes_refitted": false,
+    "rsa_recomputed_from_hidden_states": false
+  }
+}

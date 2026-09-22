@@ -1,0 +1,520 @@
+{
+  "version": 2,
+  "comparison": "Python function AST, ignoring docstrings, no-op markdown and progress print calls. This is a source check, not a GPU execution test.",
+  "matching_function_bodies": 343,
+  "files": [
+    {
+      "path": "src/analyse.py",
+      "source": "original_sources/extracted/Subjectesis_Analysis/code/analyse.py",
+      "original_artifact_sha256": "df98936ffcb324eb6966d9166ba745a529a10adece938472222906c27565658c",
+      "original_code_sha256": "df98936ffcb324eb6966d9166ba745a529a10adece938472222906c27565658c",
+      "published_source_sha256": "712b6a12a3588bceb9947fd337995d96a75419e04d793fc18d32c6b49aa7a52a",
+      "matching_function_bodies_ignoring_explanations_and_prints": 21,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Added checked extraction of bundled raw inputs, except in test_analysis which imports analyse."
+      ]
+    },
+    {
+      "path": "src/check_cognitive_results.py",
+      "source": "New packaging/checking code for this repository",
+      "published_source_sha256": "f916109473ad50eec67295b5542750c43ca43750a825f1206d01cde4eef2a3f1",
+      "changes": [
+        "New entry point or CPU verification helper; not represented as an original executed experiment."
+      ]
+    },
+    {
+      "path": "src/cognitive_analysis.py",
+      "source": "upload/subjectesis_cognitive_representational_analysis_a100_(2).py",
+      "original_artifact_sha256": "8dd8ad3d9d252e5807101e1cd841d151622e6ec4d421cb1c596ba232b1d3873e",
+      "original_code_sha256": "8dd8ad3d9d252e5807101e1cd841d151622e6ec4d421cb1c596ba232b1d3873e",
+      "published_source_sha256": "10c8627589331e61577f79e3814efc8bac653a562aee48ab97382df50868ee5a",
+      "matching_function_bodies_ignoring_explanations_and_prints": 21,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Embedded source recovery replaced by project_setup; original analysis operations retained."
+      ]
+    },
+    {
+      "path": "src/evaluate_opentom.py",
+      "source": "Subjectesis_OpenToM_Frozen_Transfer_A100 (2).ipynb",
+      "original_artifact_sha256": "850c057f2365799b21d1f6698926326753b8395ddfeb66fcc431fcf2dda1a65c",
+      "original_code_sha256": "59a3f9c9025358c84eb2035267c68c5f063f269fcd254e73439d9cbdae3442a4",
+      "published_source_sha256": "481054081a56dc5c4fc89952df2c88bcacc54a799f933bb8156d4670bbabc473",
+      "matching_function_bodies_ignoring_explanations_and_prints": 24,
+      "changed_function_bodies": [
+        "plot_info"
+      ],
+      "omitted_original_functions": [
+        "bootstrap_system_metrics",
+        "build_story_statistics",
+        "family_score",
+        "metric_block",
+        "normalize_accessibility_reference",
+        "official_lexical_overlap",
+        "official_remove_determinant",
+        "overlap",
+        "parse_opentom_prediction",
+        "parse_pred",
+        "percentile_ci",
+        "read_jsonl",
+        "remove_det",
+        "score",
+        "score_direct_rows",
+        "strict_target_macro_f1",
+        "structured_to_direct",
+        "summarize_system",
+        "summary"
+      ],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Notebook stages exported as a script; embedded source extraction replaced by project_setup; original Colab paths retained.",
+        "Corrected plot_info to explicit metadata keys; omitted obsolete scoring stage and directed scoring to rescore_opentom.py."
+      ]
+    },
+    {
+      "path": "src/evaluate_rectom.py",
+      "source": "Subjectesis_RecToM_Final_Sealed_Test_A100 (1).ipynb",
+      "original_artifact_sha256": "cdd8637e227b3d4089e82bef6b2f80da94b6c97c931ee71d2a36f3e9cc078a26",
+      "original_code_sha256": "bcc1b5587dc58f82711885716eef82c026fb273b50555d2ba71a1a563394ea00",
+      "published_source_sha256": "d7c3f195f879303daf1416d97c03daffd0cc8e7fc52862fce1e80dc6a3e1c541",
+      "matching_function_bodies_ignoring_explanations_and_prints": 39,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [
+        "safe_extract_payload"
+      ],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Notebook stages exported as a script; embedded source extraction replaced by project_setup; original Colab paths retained."
+      ]
+    },
+    {
+      "path": "src/figures.py",
+      "source": "original_sources/extracted/Subjectesis_Analysis/code/figures.py",
+      "original_artifact_sha256": "68008255f7be0054860d0e44a7ea3099353a5fbe54f61fbe3967792f6af6f402",
+      "original_code_sha256": "68008255f7be0054860d0e44a7ea3099353a5fbe54f61fbe3967792f6af6f402",
+      "published_source_sha256": "3dd9d96100b447ae3567dd6967bdb67c4bdcb3862d3594db6c2b49211f3035cf",
+      "matching_function_bodies_ignoring_explanations_and_prints": 2,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Added checked extraction of bundled raw inputs, except in test_analysis which imports analyse."
+      ]
+    },
+    {
+      "path": "src/integrity.py",
+      "source": "original_sources/extracted/Subjectesis_Analysis/code/integrity.py",
+      "original_artifact_sha256": "d89862c67ea828d81abd22d669eef615d1a5c60a6300081a43fbda21a237a0cb",
+      "original_code_sha256": "d89862c67ea828d81abd22d669eef615d1a5c60a6300081a43fbda21a237a0cb",
+      "published_source_sha256": "2498501319431e2d3a49cb0a363e90d6b1a6ba67cc5b7aab8b35fa63b41a1125",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Added checked extraction of bundled raw inputs, except in test_analysis which imports analyse."
+      ]
+    },
+    {
+      "path": "src/preparation/audit_citation_controls.py",
+      "source": "original_sources/training_payload/preparation/code/audit_citation_controls.py",
+      "original_artifact_sha256": "f91eb1341eafbc104e26a57f68ba12061b9bd5f645971ef6a3fe51234ac8f5b6",
+      "original_code_sha256": "f91eb1341eafbc104e26a57f68ba12061b9bd5f645971ef6a3fe51234ac8f5b6",
+      "published_source_sha256": "533814ee959f9a25185ab31aa4e82800f234b5dfe5df209e6611a3f81109db72",
+      "matching_function_bodies_ignoring_explanations_and_prints": 2,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/preparation/build_full.py",
+      "source": "original_sources/training_payload/preparation/code/build_full.py",
+      "original_artifact_sha256": "52b4b18b4cd553cc1dbfa3d676cd93a13744f83a39b6d464e91481b7c62bfcf1",
+      "original_code_sha256": "52b4b18b4cd553cc1dbfa3d676cd93a13744f83a39b6d464e91481b7c62bfcf1",
+      "published_source_sha256": "579722dd5e5f1b99e12211c4778cf79631139d3115c1246b24177873cfe9479d",
+      "matching_function_bodies_ignoring_explanations_and_prints": 8,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/preparation/convert_v1.py",
+      "source": "original_sources/training_payload/preparation/code/convert_v1.py",
+      "original_artifact_sha256": "3dafb514e403a3a904a926ed6580b97cd09ecb7a7eedb1f60551eee5a43c4799",
+      "original_code_sha256": "3dafb514e403a3a904a926ed6580b97cd09ecb7a7eedb1f60551eee5a43c4799",
+      "published_source_sha256": "fe1f1cf4f056a87f67aeb67c8b015ba0ec4c9f46365ae245235bf2f9bba95996",
+      "matching_function_bodies_ignoring_explanations_and_prints": 16,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/preparation/dataset_io.py",
+      "source": "original_sources/training_payload/preparation/code/dataset_io.py",
+      "original_artifact_sha256": "1bff0c6d5461c3498be603ac28596b5a1cea858355bb7625703d448770e9ce0e",
+      "original_code_sha256": "1bff0c6d5461c3498be603ac28596b5a1cea858355bb7625703d448770e9ce0e",
+      "published_source_sha256": "8f337965717fe6ffe1132937f0bd17e409ce4753c471e14e39096a3442d5096c",
+      "matching_function_bodies_ignoring_explanations_and_prints": 3,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/preparation/packets.py",
+      "source": "original_sources/training_payload/preparation/code/packets.py",
+      "original_artifact_sha256": "26272a3a89a1d128a581873249bd1bda327b0ecd31f2a39f9c7f68b109c4969c",
+      "original_code_sha256": "26272a3a89a1d128a581873249bd1bda327b0ecd31f2a39f9c7f68b109c4969c",
+      "published_source_sha256": "646ff76c59421ff19c08fad1e665276376e920f8dee120a94a2c0049031346a9",
+      "matching_function_bodies_ignoring_explanations_and_prints": 3,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/preparation/test_full.py",
+      "source": "original_sources/training_payload/preparation/code/test_full.py",
+      "original_artifact_sha256": "161a63baac4cb92a5df8f8b9bbee63a6fc4be41ea8d9d0ede49e2d259e194908",
+      "original_code_sha256": "161a63baac4cb92a5df8f8b9bbee63a6fc4be41ea8d9d0ede49e2d259e194908",
+      "published_source_sha256": "4797daa4a453644563eb75666519af865e0fd6981c9fdeb40882218298cd8b31",
+      "matching_function_bodies_ignoring_explanations_and_prints": 34,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/preparation/verify_tokenization.py",
+      "source": "original_sources/training_payload/preparation/code/verify_tokenization.py",
+      "original_artifact_sha256": "463202e0e2c477cfeb6a0b71334efaf4e13c15af22a0acf360e2b457d3ddfac7",
+      "original_code_sha256": "463202e0e2c477cfeb6a0b71334efaf4e13c15af22a0acf360e2b457d3ddfac7",
+      "published_source_sha256": "5b2bcc712c67666f0aba236f6e58c851b2edb5665b0ae508cfe3d851243e5905",
+      "matching_function_bodies_ignoring_explanations_and_prints": 3,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/project_setup.py",
+      "source": "New packaging/checking code for this repository",
+      "published_source_sha256": "accf0fc6f178bf4e64a4aef69788505bad65a6942931c50d4c0561812bda4c7f",
+      "changes": [
+        "New entry point or CPU verification helper; not represented as an original executed experiment."
+      ]
+    },
+    {
+      "path": "src/rescore_opentom.py",
+      "source": "Subjectesis_OpenToM_Corrected_Rescoring_CPU.ipynb",
+      "original_artifact_sha256": "9429874a7f925e091a4bc019eb25d3da9d1c799cd321d06aa427a6525e8f25fe",
+      "original_code_sha256": "cad6024a199f18f39231a06e3e0b2e61b1c719130d43881ba981fdd01cb79e21",
+      "published_source_sha256": "fa3b4647b1603667446de9d2a34047090cc76cc8b3fd97f3c89377c9c525f15b",
+      "matching_function_bodies_ignoring_explanations_and_prints": 16,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Notebook stages exported as a script; embedded source extraction replaced by project_setup; original Colab paths retained."
+      ]
+    },
+    {
+      "path": "src/supplementary.py",
+      "source": "original_sources/extracted/Subjectesis_Analysis/code/supplementary.py",
+      "original_artifact_sha256": "9cebe3dfcfc84f08d1e1cedd9164fe250558099dc76ef7e0c937324577e57b58",
+      "original_code_sha256": "9cebe3dfcfc84f08d1e1cedd9164fe250558099dc76ef7e0c937324577e57b58",
+      "published_source_sha256": "c9073d3d3d800a37a22cc0cd8d71717ffd099fb802cee7680d22bcc0f723772b",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Added checked extraction of bundled raw inputs, except in test_analysis which imports analyse."
+      ]
+    },
+    {
+      "path": "src/test_analysis.py",
+      "source": "original_sources/extracted/Subjectesis_Analysis/code/test_analysis.py",
+      "original_artifact_sha256": "66fded3f99824dbad2a75570f5dcae242545fda418f3b25afe0624c2ff8b8b5c",
+      "original_code_sha256": "66fded3f99824dbad2a75570f5dcae242545fda418f3b25afe0624c2ff8b8b5c",
+      "published_source_sha256": "007d1e65e7982c265417c08e01d86dca59f02d0ca55a99ecfa8a44bb7ec718dc",
+      "matching_function_bodies_ignoring_explanations_and_prints": 8,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Added checked extraction of bundled raw inputs, except in test_analysis which imports analyse."
+      ]
+    },
+    {
+      "path": "src/train_answer_only.py",
+      "source": "Subjectesis_AnswerOnly_Qwen35_4B_Colab_A100 (1).ipynb",
+      "original_artifact_sha256": "70d4307455364f715066e5f6e574c4034e4bac2ab6694b39b0e331ec8fc0e930",
+      "original_code_sha256": "21ef6519f070037da2f96e4d60644ab7a4b70133abf8ea6eeb69031c24bc5c59",
+      "published_source_sha256": "734756ee133965c15e396740ca4b2acf87237a2dbadbf60459af29ab61f0816c",
+      "matching_function_bodies_ignoring_explanations_and_prints": 6,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [
+        "safe_extract_bytes"
+      ],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Notebook stages exported as a script; embedded source extraction replaced by project_setup; original Colab paths retained.",
+        "Moved embedded A100 wrapper to src/training; historical resume restores original source bytes from its recovery archive."
+      ]
+    },
+    {
+      "path": "src/train_subjectesis.py",
+      "source": "New packaging/checking code for this repository",
+      "published_source_sha256": "cfc51904f36cc537dee35d9580bfa1f2c0b50aa89fbead4a3b60051196c9b999",
+      "changes": [
+        "New entry point or CPU verification helper; not represented as an original executed experiment."
+      ]
+    },
+    {
+      "path": "src/training/a100_answer_only.py",
+      "source": "Subjectesis_AnswerOnly_Qwen35_4B_Colab_A100 (1).ipynb; embedded WRAPPER_CODE",
+      "original_artifact_sha256": "70d4307455364f715066e5f6e574c4034e4bac2ab6694b39b0e331ec8fc0e930",
+      "original_code_sha256": "24d6a4066f0bebe307f7063adef41795dec92745067a03e393bc1f1c5d64e144",
+      "published_source_sha256": "213f4dcdd42a1e2e6966a18472593c80f963f0355c254f55dc92aac734a6cc24",
+      "matching_function_bodies_ignoring_explanations_and_prints": 4,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/a100_subjectesis.py",
+      "source": "Greeting exchange, nodes 2091 and 2136; A100 continuation and final gradient-checkpointing restoration",
+      "original_artifact_sha256": "d96556272b2f37d0c29c278aca210d546b2069274d1dd0edc318866f68240689",
+      "original_code_sha256": "d96556272b2f37d0c29c278aca210d546b2069274d1dd0edc318866f68240689",
+      "published_source_sha256": "92c0f3a1064b1a19064ae24670f2eb23e2ee0c8b4066f97ab778d1587c459bab",
+      "matching_function_bodies_ignoring_explanations_and_prints": 3,
+      "changed_function_bodies": [
+        "optimize_group_a100"
+      ],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Applied the recorded final gradient-checkpointing restoration to optimize_group_a100."
+      ]
+    },
+    {
+      "path": "src/training/common.py",
+      "source": "original_sources/training_payload/code/common.py",
+      "original_artifact_sha256": "930e51cc4d13ac90dbb968b5c6c7c36bb45e3c2702d6a3770d1dbbc2f313a0f4",
+      "original_code_sha256": "930e51cc4d13ac90dbb968b5c6c7c36bb45e3c2702d6a3770d1dbbc2f313a0f4",
+      "published_source_sha256": "750ad46627e1b3f49e52b7429afc7c2940c52d49cee8a03a06776acd4fa697f9",
+      "matching_function_bodies_ignoring_explanations_and_prints": 11,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/download_model.py",
+      "source": "original_sources/training_payload/code/download_model.py",
+      "original_artifact_sha256": "b5539c604d1d302500ad77c58e8c604de4f0ac70721e98f7790c8f628d012b5e",
+      "original_code_sha256": "b5539c604d1d302500ad77c58e8c604de4f0ac70721e98f7790c8f628d012b5e",
+      "published_source_sha256": "9d7d8649abeb057a90fd6260339da161b5b3e1cc1a587bcb3077ddce9b00225a",
+      "matching_function_bodies_ignoring_explanations_and_prints": 3,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/engine.py",
+      "source": "original_sources/training_payload/code/engine.py",
+      "original_artifact_sha256": "96e8d6645229d2cf5f230a1695c9fd481ed611a0bcc147f0220ed7fce7a23e69",
+      "original_code_sha256": "96e8d6645229d2cf5f230a1695c9fd481ed611a0bcc147f0220ed7fce7a23e69",
+      "published_source_sha256": "531d22285e53cf470fa751e68f6b880609bb0d217fed37e8d00d9835df52ed59",
+      "matching_function_bodies_ignoring_explanations_and_prints": 9,
+      "changed_function_bodies": [
+        "optimize_group"
+      ],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Restored training mode and active decoder-checkpointing check from the executed notebook runtime patch; omitted its one-time progress message."
+      ]
+    },
+    {
+      "path": "src/training/launch.py",
+      "source": "original_sources/training_payload/code/launch.py",
+      "original_artifact_sha256": "bec332e46c00358b226e56ba5cb9c5abc8abe9776135a6b3fa1be32fb41c6701",
+      "original_code_sha256": "bec332e46c00358b226e56ba5cb9c5abc8abe9776135a6b3fa1be32fb41c6701",
+      "published_source_sha256": "ecc15feb60934022ed4c6f8660779b0dc9934a3212dee9a959733feb40d3b087",
+      "matching_function_bodies_ignoring_explanations_and_prints": 4,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/model_contract.py",
+      "source": "original_sources/training_payload/code/model_contract.py",
+      "original_artifact_sha256": "eb1476fb292f17ccd0847ce780fb2c707bdd22b5faf42047f85d2d3a4a7788f9",
+      "original_code_sha256": "eb1476fb292f17ccd0847ce780fb2c707bdd22b5faf42047f85d2d3a4a7788f9",
+      "published_source_sha256": "1dcafbc8a3ac2cf8107bd779af10a62e142f65472bb59a54d64c95d330c589dd",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/model_runtime.py",
+      "source": "original_sources/training_payload/code/model_runtime.py",
+      "original_artifact_sha256": "1cf0fc5c28c466deafe4a6dc6980e6bfafd669ce1aae4aa37437a08bbb172a68",
+      "original_code_sha256": "1cf0fc5c28c466deafe4a6dc6980e6bfafd669ce1aae4aa37437a08bbb172a68",
+      "published_source_sha256": "198a29679350276ac00fe68fef92060959864b07ae35ff281c973e1a31636c7d",
+      "matching_function_bodies_ignoring_explanations_and_prints": 2,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/prepare.py",
+      "source": "original_sources/training_payload/code/prepare.py",
+      "original_artifact_sha256": "0886d8c18abed25c04cfe62177e1056869246921cead731bf4fbe9ce688b79b1",
+      "original_code_sha256": "0886d8c18abed25c04cfe62177e1056869246921cead731bf4fbe9ce688b79b1",
+      "published_source_sha256": "e7f35f7f784d051d76a5d5cf1ddde0cac80767a8f12fee8284f68a72171023fe",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/setup_runtime.py",
+      "source": "original_sources/training_payload/code/setup_runtime.py",
+      "original_artifact_sha256": "f6e8ea9e4b6570c763043aea834b90a85f5ba43bedfd338c59c738fc41511aba",
+      "original_code_sha256": "f6e8ea9e4b6570c763043aea834b90a85f5ba43bedfd338c59c738fc41511aba",
+      "published_source_sha256": "c96338291019a1b77e61c1f0f90facca20931475388db038ba66f6424189dc0c",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/test_4b_adaptation.py",
+      "source": "original_sources/training_payload/code/test_4b_adaptation.py",
+      "original_artifact_sha256": "39555f4b2f527a9bb96148b1deb4501210265b317ebc9cc2a1a3431a971e597e",
+      "original_code_sha256": "39555f4b2f527a9bb96148b1deb4501210265b317ebc9cc2a1a3431a971e597e",
+      "published_source_sha256": "9d34c4cfc0ecc198f9504c9891e12b4e03928a0a2b20e7387cc5155cd4e00ee4",
+      "matching_function_bodies_ignoring_explanations_and_prints": 14,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/test_ddp_cpu.py",
+      "source": "original_sources/training_payload/code/test_ddp_cpu.py",
+      "original_artifact_sha256": "bb1360ec9383ba2c3b5ef8cde324a0e10f1bf3e1643c81ea43c408abf7e14cd6",
+      "original_code_sha256": "bb1360ec9383ba2c3b5ef8cde324a0e10f1bf3e1643c81ea43c408abf7e14cd6",
+      "published_source_sha256": "4cf2ff8adebc150882a8c26fd1d326fc41b090f7cf2f65f7ac4117fec9a5858a",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/tests_cpu.py",
+      "source": "original_sources/training_payload/code/tests_cpu.py",
+      "original_artifact_sha256": "bf26c98e08c53547d5fc5dce52689c574be824b49aaca19048e7f4e02705596b",
+      "original_code_sha256": "bf26c98e08c53547d5fc5dce52689c574be824b49aaca19048e7f4e02705596b",
+      "published_source_sha256": "40e5a29ec6f0c9d4cc182b858242c4255b4b0d3789f379d27acb2e97d80ba8a4",
+      "matching_function_bodies_ignoring_explanations_and_prints": 29,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/tiny_qwen_check.py",
+      "source": "original_sources/training_payload/code/tiny_qwen_check.py",
+      "original_artifact_sha256": "cd37cd5c0df5e2e2a27a6fcb8ffdf1c25e5412e4566f4a6a5010f24ad514f9c7",
+      "original_code_sha256": "cd37cd5c0df5e2e2a27a6fcb8ffdf1c25e5412e4566f4a6a5010f24ad514f9c7",
+      "published_source_sha256": "babcc763cce3d5bc38ed2ce719740b9dc3dbea1b623a7954d2c4a76c0ee1b9d8",
+      "matching_function_bodies_ignoring_explanations_and_prints": 1,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/tokenize_data.py",
+      "source": "original_sources/training_payload/code/tokenize_data.py",
+      "original_artifact_sha256": "acbdda3be191a024c08a6f7e64ab9dba45f5bcdc5a933337d78d1c0ad906f277",
+      "original_code_sha256": "acbdda3be191a024c08a6f7e64ab9dba45f5bcdc5a933337d78d1c0ad906f277",
+      "published_source_sha256": "00fc0ce6df0e07e8cd89a0dc48cc6d45b53515461e88b801b53d7bfd62e2ae92",
+      "matching_function_bodies_ignoring_explanations_and_prints": 2,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/training/train.py",
+      "source": "original_sources/training_payload/code/train.py",
+      "original_artifact_sha256": "c71f4046087686a287e2295f36d880711eaefdb7e87bcf2d6e0e62d415563d4b",
+      "original_code_sha256": "c71f4046087686a287e2295f36d880711eaefdb7e87bcf2d6e0e62d415563d4b",
+      "published_source_sha256": "9ae39b0ccfe72c4ac418f22a84ac7f3f40a29dfb176353b08f201b8a64335575",
+      "matching_function_bodies_ignoring_explanations_and_prints": 13,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present."
+      ]
+    },
+    {
+      "path": "src/validate_rectom.py",
+      "source": "Subjectesis_RecToM_Development_Evaluation_A100 (1).ipynb",
+      "original_artifact_sha256": "81a133c70b99b9b1688509942ad417d551a6294ad7d1ab5b781c0a1ef1a16ad1",
+      "original_code_sha256": "fb043e95cc47c5159ea3d544ec744ec029c884e1e772483b88c9e037b6a13e75",
+      "published_source_sha256": "6292fb4635d75ce984831ae65597998b30f446916accaea4164fcefae1a46bee",
+      "matching_function_bodies_ignoring_explanations_and_prints": 36,
+      "changed_function_bodies": [],
+      "omitted_original_functions": [
+        "safe_extract_payload"
+      ],
+      "changes": [
+        "Formatting, module/function explanations and comments; console emojis removed where present.",
+        "Notebook stages exported as a script; embedded source extraction replaced by project_setup; original Colab paths retained."
+      ]
+    }
+  ]
+}

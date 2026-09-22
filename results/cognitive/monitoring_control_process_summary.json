@@ -1,0 +1,52 @@
+{
+  "rectom": {
+    "questions": 621,
+    "review_calls": 1313,
+    "answer_changes": 0,
+    "decision_counts": {
+      "preserve": 952,
+      "retain_unknown": 313,
+      "revise": 48
+    },
+    "field_review_counts": {
+      "proposer": 346,
+      "seen": 346,
+      "appraisal": 77,
+      "recommendation_response": 269,
+      "intends_to_watch": 275
+    },
+    "field_value_changes": {
+      "seen": 34,
+      "recommendation_response": 9,
+      "appraisal": 4,
+      "intends_to_watch": 1
+    },
+    "field_basis_changes": {
+      "seen": 33,
+      "recommendation_response": 9,
+      "appraisal": 4,
+      "intends_to_watch": 1
+    },
+    "field_evidence_turn_changes": {
+      "seen": 32,
+      "recommendation_response": 9,
+      "appraisal": 4,
+      "intends_to_watch": 1
+    },
+    "preserve_decision_with_changed_value": 0
+  },
+  "opentom": {
+    "questions": 621,
+    "invalid_initial": 0,
+    "invalid_review": 0,
+    "decision_counts": {
+      "preserve": 236,
+      "revise": 384,
+      "retain_unknown": 1
+    },
+    "mental_state_claim_changes": 220,
+    "evidence_sentence_changes": 67,
+    "uncertainty_changes": 31,
+    "raw_answer_changes": 31
+  }
+}

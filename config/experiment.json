@@ -1,0 +1,32 @@
+{
+  "model": {
+    "name": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "training": {
+    "method": "NF4 QLoRA",
+    "epochs": 1,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "learning_rate": 0.0001,
+    "effective_batch_size": 8,
+    "max_length": 2048,
+    "seed": 42
+  },
+  "selected_checkpoints": {
+    "answer_only_step": 1000,
+    "answer_only_examples_seen": 8000,
+    "subjectesis_step": 2500,
+    "subjectesis_examples_seen": 20000
+  },
+  "datasets": {
+    "rectom_train_dialogues": 235,
+    "rectom_train_questions": 2270,
+    "rectom_validation_dialogues": 34,
+    "rectom_validation_questions": 319,
+    "rectom_test_dialogues": 67,
+    "rectom_test_questions": 621,
+    "opentom_transfer_stories": 27,
+    "opentom_transfer_questions": 621
+  }
+}

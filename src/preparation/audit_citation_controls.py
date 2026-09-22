@@ -1,4 +1,10 @@
-"""Revision-4 data preparation: audit citation controls."""
+"""Inspect the citation-control examples in revision-4 supervision.
+
+The audit checks cases where a missing citation should be recovered and cases
+where a real citation does not establish the selected claim under the recorded
+annotation. It writes construction receipts and counts, without claiming
+independent semantic validation or shortcut-free learning.
+"""
 
 import json, hashlib
 from collections import Counter, defaultdict
@@ -9,6 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def previous_state(example):
+    """Read the current-state JSON embedded in a review-training prompt. The audit
+    needs this actual input state to compare citation presence with the
+    supervised correction.
+    """
     return json.loads(
         example["messages"][0]["content"]
         .split("Current perspective state (may contain mistakes): ")[1]
@@ -17,6 +27,12 @@ def previous_state(example):
 
 
 def run():
+    """Inspect review examples where a known value lacks citations or an
+    unsupported value carries a misleading citation. Check their targets and
+    write counts and receipts showing that citation presence alone does not
+    determine whether a field should remain known; this is not proof that no
+    shortcut was learned.
+    """
     ledger = {
         r["record_id"]: r
         for r in map(

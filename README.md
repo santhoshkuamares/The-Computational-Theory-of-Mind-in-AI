@@ -4,7 +4,7 @@ This repository contains the code and saved outputs for the Subjectesis experime
 
 The study asks whether structured perspective-state supervision and bounded review help computational Theory of Mind. The results are mixed. Improvements, null results and adverse results are retained. The cognitive analysis was added after the benchmark results and is exploratory.
 
-The source was recovered from the executed notebooks, their embedded Python files, the supplied statistical package and the recorded A100 continuation. It is arranged as readable Python with explanations. Prompt wording, labels and scoring rules were retained, except for the explicit OpenToM metadata correction explained below. There is no separate `docs` directory.
+The source was recovered from the executed notebooks, their embedded Python files, the supplied statistical package and the recorded A100 continuation. Each function includes a short explanation of its purpose, how it works and its return value or saved output. Comments inside longer functions explain the decisions that affect the experiment. Prompt wording, labels and scoring rules were retained, except for the explicit OpenToM metadata correction explained below. There is no separate `docs` directory.
 
 ## Repository contents
 
@@ -30,7 +30,6 @@ python -m pip install -r requirements.txt
 python src/analyse.py
 python src/supplementary.py
 python src/test_analysis.py
-python src/integrity.py
 python src/check_cognitive_results.py
 python src/figures.py
 ```
@@ -41,7 +40,6 @@ The scripts extract `data/frozen_analysis_inputs.zip` into `inputs/`, rejecting 
 | --- | --- |
 | `analyse.py` | Joins predictions to references by record ID; computes accuracy and fixed-class macro F1, cluster bootstrap intervals, paired comparisons, review transitions and checkpoint exposure. |
 | `supplementary.py` | Examines task/order subgroups, parser outcomes and state-answer agreement. It generates an error casebook and replays an uncertainty-triggered review rule using saved branches, without new inference. |
-| `integrity.py` | Checks input hashes, frozen protocols, answer-free model inputs and the corrected OpenToM subset. With rebuilt preparation data, it also checks the matched training schedule. |
 | `test_analysis.py` | Tests bootstrap calculations against explicit row expansion, exact paired swaps, invalid predictions and Holm correction. |
 | `check_cognitive_results.py` | Recomputes counterfactual metrics and process counts from individual records. Checks probe split separation and final-layer table consistency without claiming to refit probes. |
 | `figures.py` | Reads the result tables and draws the benchmark, review, exposure and architecture figures without altering scores. |
@@ -53,7 +51,6 @@ There are 5,000 bootstrap repetitions, resampling dialogues for RecToM and stori
 
 ```bash
 python src/train_subjectesis.py --root work/subjectesis --prepare-only
-python src/integrity.py --preparation work/subjectesis/preparation
 ```
 
 Preparation rebuilds revision 4 from the bundled task data, split manifest and annotation decisions. It runs the 31 original preparation tests and verifies the original output hashes. No GPU is needed.
@@ -69,7 +66,6 @@ Both full training schedules contain 30,266 examples with identical question-exp
 | `dataset_io.py` | Restricts training to eligible records and masks prompt tokens so only completion tokens contribute to loss. |
 | `packets.py` | Groups source records used by the preparation and annotation process. |
 | `audit_citation_controls.py` | Checks that citation presence alone does not determine a supervision target. |
-| `verify_tokenization.py` | Checks tokenization and truncation against the intended supervision; requires tokenizer dependencies. |
 | `test_full.py` | Checks splits, unchanged labels and held-out data, quarantine, evidence rules, masks and deterministic rebuilding. |
 
 ## Training
@@ -102,7 +98,6 @@ python src/train_subjectesis.py --root /content/subjectesis_resume --mode a100 -
 | `a100_answer_only.py`, `a100_subjectesis.py` | Retain the recorded single-GPU optimizer wrappers. Smaller microbatches handle memory limits while keeping the logical batch and token normalization. The Subjectesis wrapper restores gradient checkpointing. |
 | `launch.py`, `setup_runtime.py` | Check and set up the original two-T4 environment, launch training, stream progress and package recovery outputs. |
 | `common.py` | Provides checked data loading, hashing, batch grouping and recovery packaging. |
-| `tests_cpu.py`, `test_ddp_cpu.py`, `test_4b_adaptation.py`, `tiny_qwen_check.py` | Original loss, distributed accumulation, model-adaptation and small-model checks. These require training dependencies even when they do not need a GPU. |
 
 Formatting changes source-byte hashes. Historical resume therefore restores exact code from the verified recovery archive and retains the original identity checks. Use a fresh working directory for restoration. A fresh run on different hardware is not claimed to reproduce identical weights.
 
@@ -156,7 +151,7 @@ In the system tables, `accuracy` means correct questions divided by all question
 | `subgroup_metrics.csv`, `opentom_parser_audit.csv`, `rectom_state_answer_agreement.csv` | Subgroup scores, parser details and agreement between explicit states and answers. |
 | `offline_review_policy_replay.csv` | Exploratory selection of saved review branches by an uncertainty rule. |
 | `training_audit.csv`, `validation_history.csv` | Exposure, token counts and checkpoint selection. Duplicate resumed log steps are not counted as new optimizer steps. |
-| `*_reconciliation.json`, `input_hashes.json`, `integrity_audit.json` | Connections between recalculated metrics, frozen inputs and saved outputs. |
+| `*_reconciliation.json`, `input_hashes.json` | Connections between recalculated metrics, frozen inputs and saved outputs. |
 | `semantic_case_review/notes.json` | Recorded interpretive case notes, not independent human ratings or inter-rater reliability evidence. |
 
 ## Cognitive and representational analysis
@@ -186,4 +181,4 @@ The probe results do not show a uniform Subjectesis advantage: final-layer `seen
 
 Preparation rebuilt to the original hashes and passed all 31 data tests. CPU benchmark and supplementary analyses reproduced the supplied numerical outputs; all eight statistical tests passed. Counterfactual metrics and process counts were recomputed from individual records. Probe split separation and final-layer table consistency were checked.
 
-`config/source_provenance.json` records source origins, hashes and packaging changes. `results/repository_verification.json` records this cleanup's checks. GPU training and inference were not rerun, and probe/RSA arrays were not independently recomputed.
+`config/source_provenance.json` records the original recovery audit and the documentation update. All 311 functions in the 31 retained Python files have explanations. A syntax-tree comparison, excluding docstrings, confirms that the documentation update leaves executable statements unchanged. GPU training and inference were not rerun, and probe/RSA arrays were not independently recomputed.

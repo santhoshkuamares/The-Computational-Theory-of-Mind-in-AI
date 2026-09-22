@@ -16,23 +16,38 @@ from model_runtime import build_network, frozen_sample
 class Tokens:
 
     def __init__(self, path):
+        """Load the compressed token arrays, example offsets and prompt lengths
+        from disk. Keeping tokens in flat arrays avoids storing a separate
+        large Python object for every training example.
+        """
         z = np.load(path, allow_pickle=False)
         self.ids = z["ids"]
         self.offsets = z["offsets"]
         self.prefixes = z["prefixes"]
 
     def __len__(self):
+        """Return the number of examples recorded in the prefix-length array. The
+        training loop uses this count to construct the epoch schedule and check
+        total exposure.
+        """
         return len(self.prefixes)
 
     # Prompt tokens use -100 so they do not become supervised targets.
     def __getitem__(self, i):
+        """Recover one example from the flat token array and return its input IDs
+        and labels. Mask the prompt labels with -100 so only the assistant
+        completion contributes to next-token training loss.
+        """
         ids = self.ids[self.offsets[i] : self.offsets[i + 1]].astype(np.int64).tolist()
         p = int(self.prefixes[i])
         return {"input_ids": ids, "labels": [-100] * p + ids[p:]}
 
 
 def distributed_info():
-    """Initialize the original two-process GPU training environment."""
+    """Initialize the original two-process NCCL training group from torchrun
+    environment variables. Assign each process to its local GPU and return its
+    rank, group size and device for data partitioning and synchronization.
+    """
     rank = int(os.environ["RANK"])
     local = int(os.environ["LOCAL_RANK"])
     world = int(os.environ["WORLD_SIZE"])
@@ -46,6 +61,10 @@ def distributed_info():
 
 
 def rng_state(device):
+    """Capture the PyTorch CPU, current CUDA and Python random-generator states.
+    Checkpoints save these values so continuation can resume the recorded
+    random sequence.
+    """
     return {
         "cpu": torch.get_rng_state(),
         "cuda": torch.cuda.get_rng_state(device),
@@ -54,13 +73,21 @@ def rng_state(device):
 
 
 def restore_rng(s, device):
+    """Restore the CPU, CUDA and Python random states from a checkpoint. This is
+    used after loading the adapter and optimizer so a resumed run follows the
+    saved state rather than a fresh seed.
+    """
     torch.set_rng_state(s["cpu"])
     torch.cuda.set_rng_state(s["cuda"], device)
     random.setstate(s["python"])
 
 
 def save_checkpoint(root, network, opt, scaler, progress, run_id, device):
-    """Save adapter, optimizer, scaler, RNG and progress together before updating the latest pointer."""
+    """Save the adapter, optimizer, loss scaler, progress and each process random
+    state as one checked checkpoint. Write through a temporary directory,
+    update the latest pointer only afterward, and retain the two most recent
+    completed checkpoints.
+    """
     rank = dist.get_rank()
     states = [None] * dist.get_world_size() if rank == 0 else None
     dist.gather_object(rng_state(device), states, dst=0)
@@ -102,7 +129,11 @@ def save_checkpoint(root, network, opt, scaler, progress, run_id, device):
 
 
 def load_checkpoint(folder, network, opt, scaler, run_id, device):
-    """Verify a checkpoint identity and restore its training state."""
+    """Verify saved file checksums and the model/data/code/settings identity
+    before restoring training state. Load adapter weights, optimizer, loss
+    scaler and the current rank random state, then return the progress counters
+    used to resume the loop.
+    """
     from safetensors.torch import load_file
     from peft import set_peft_model_state_dict
 
@@ -126,7 +157,11 @@ def load_checkpoint(folder, network, opt, scaler, run_id, device):
 
 @torch.no_grad()
 def validate(wrapper, root, tokenizer, device, step):
-    """Constrained first-answer-token validation, not a runtime Subjectesis-loop score."""
+    """Score the 319 validation questions by choosing the highest-logit allowed
+    answer letter. Gather predictions across processes and return belief and
+    desire accuracy plus their mean, which selects checkpoints without using
+    sealed test labels or the review loop.
+    """
     rank = dist.get_rank()
     world = dist.get_world_size()
     rows = read_json(root / "tokenized/validation_inputs.json")
@@ -194,7 +229,11 @@ def validate(wrapper, root, tokenizer, device, step):
 
 
 def smoke(root, wrapper, ddp, network, data, c, opt, scaler, device):
-    """Real longest-example backward, update, adapter reload. Discard every smoke update."""
+    """Try a backward pass and update on the longest real training example, then
+    check adapter saving and reloading. Restore the original adapter afterward
+    and report the checks; the caller also recreates the optimizer and scaler
+    before actual training.
+    """
     from safetensors.torch import load_file
     from peft import set_peft_model_state_dict
 
@@ -259,6 +298,11 @@ def smoke(root, wrapper, ddp, network, data, c, opt, scaler, device):
 
 
 def run(root, condition, smoke_only=False):
+    """Train or resume one condition using the fixed example schedule,
+    completion-only loss and validation-based checkpoint selection. Save
+    progress and recovery checkpoints during training, and distinguish a
+    resumable pause from a completed schedule without scoring the sealed test.
+    """
     root = Path(root)
     c = load_config(root)
     rank, local, world, device = distributed_info()
@@ -302,10 +346,16 @@ def run(root, condition, smoke_only=False):
         raise RuntimeError("Unexpected training parameters")
 
     def optimizer():
+        """Create AdamW over the selected trainable parameters with the recorded
+        learning rate and zero weight decay. Calling this again after the smoke
+        check removes the optimizer history of its discarded trial update.
+        """
         return torch.optim.AdamW(params, lr=c["learning_rate"], weight_decay=0.0)
 
     opt = optimizer()
     scaler = torch.amp.GradScaler("cuda", init_scale=16.0)
+    # Only the listed experiment settings enter this part of the run identity.
+    # The identity below also includes token data, source bytes and package versions.
     methods = {
         k: c[k]
         for k in [
@@ -346,6 +396,8 @@ def run(root, condition, smoke_only=False):
         latest = out / "checkpoints" / read_json(out / "latest.json")["folder"]
     if not latest:
         smoke(out, wrapper, ddp, network, data, c, opt, scaler, device)
+        # Discard the smoke-check optimizer history as well as its adapter update.
+        # The actual training schedule starts with a fresh optimizer and loss scaler.
         opt = optimizer()
         scaler = torch.amp.GradScaler("cuda", init_scale=16.0)
     else:
@@ -374,6 +426,11 @@ def run(root, condition, smoke_only=False):
         progress = load_checkpoint(latest, network, opt, scaler, run_id, device)
 
     def evaluate_and_select():
+        """Run validation at the current step and replace the best adapter only
+        when its selection score strictly improves. Save every validation
+        report so checkpoint selection can be explained from the recorded
+        history.
+        """
         result = validate(wrapper, root, tok, device, progress["step"])
         if result["selection_score"] > progress["best_score"]:
             progress["best_score"] = result["selection_score"]
@@ -404,6 +461,8 @@ def run(root, condition, smoke_only=False):
         begin = progress["next_group"] if epoch == progress["epoch"] else 0
         for gi in range(begin, len(groups)):
             group = groups[gi]
+            # Each process receives a disjoint slice of the same logical batch.
+            # The A100 wrapper changes the process count while retaining this schedule.
             local_examples = [data[i] for i in group[rank::world]]
             lr = learning_rate(
                 progress["step"], total_steps, c["learning_rate"], c["warmup_fraction"]
@@ -438,6 +497,8 @@ def run(root, condition, smoke_only=False):
                 if progress["step"] <= 3 or progress["step"] % 10 == 0:
                     print(condition, metrics, flush=True)
             previous = time.monotonic()
+            # Validation chooses the best adapter; checkpointing saves recovery state.
+            # These are separate operations and neither consults the sealed test labels.
             if progress["step"] % c["eval_steps"] == 0:
                 evaluate_and_select()
             if progress["step"] % c["save_steps"] == 0:

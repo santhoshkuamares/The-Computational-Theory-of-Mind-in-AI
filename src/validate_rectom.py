@@ -1,5 +1,9 @@
-"""Validation-only evaluation and bounded controller development on 319 RecToM questions.
-Execute as a script in the recorded Colab environment. The model and adapters are frozen.
+"""Evaluate the selected adapters and develop the controller on validation.
+
+The 319 RecToM validation questions are used to reproduce saved checkpoint
+answers and compare direct, no-review and reviewed predictions. The script
+records its controller protocol for the later sealed test. It expects the
+recorded Colab environment and completed adapter archives.
 """
 
 from project_setup import mount_drive, prepare_project
@@ -21,11 +25,19 @@ ROOT.mkdir(parents=True, exist_ok=True)
 
 
 def sha256_bytes(data):
-    """Calculate the checksum of an archive member before loading it."""
+    """Return a SHA-256 checksum for bytes read from an archive member. Comparing
+    it with the recovery manifest confirms which saved training artifact is
+    being evaluated.
+    """
     return hashlib.sha256(data).hexdigest()
 
 
 def verify_recovery_archive(path, condition):
+    """Verify all manifested archive files and require completed training with the
+    expected exposure and no recorded test scoring. Check that the selected
+    validation report agrees with completion metadata, then return the
+    completion record, best validation result and manifest.
+    """
     with zipfile.ZipFile(path) as z:
         bad = z.testzip()
         if bad:
@@ -120,6 +132,10 @@ ROOT = Path("/content/subjectesis_dev_eval_v1")
 
 
 def run(cmd, env=None):
+    """Print and execute a setup command, using the supplied environment when
+    provided. Stop on a nonzero exit code so later evaluation stages cannot
+    silently continue after failed preparation.
+    """
     cmd = [str(x) for x in cmd]
     print("\n>>>", " ".join(cmd), flush=True)
     subprocess.run(cmd, check=True, env=env)
@@ -168,6 +184,10 @@ ADAPTER_ROOT.mkdir(exist_ok=True)
 
 
 def extract_best_adapter(archive, condition, destination):
+    """Extract the selected condition best-adapter files into a fresh local
+    directory. Require both configuration and weights and reject
+    parent-directory paths so inference uses the intended saved checkpoint.
+    """
     destination = Path(destination)
     if destination.exists():
         shutil.rmtree(destination)
@@ -249,6 +269,10 @@ if any((len(v) != 1 for v in letter_ids.values())):
 
 
 def chat_ids(user_prompt):
+    """Apply the Qwen chat template with thinking disabled and return token IDs
+    for one user prompt. Reject overlength inputs instead of truncating
+    dialogue evidence before answer selection.
+    """
     text = tok.apply_chat_template(
         [{"role": "user", "content": user_prompt}],
         tokenize=False,
@@ -262,6 +286,10 @@ def chat_ids(user_prompt):
 
 
 def score_one_prompt(prompt, allowed):
+    """Compute next-token vocabulary logits and choose the highest-scoring allowed
+    option letter. This gives a constrained forced-choice answer without
+    sampling text or consulting the reference label.
+    """
     ids = torch.tensor([chat_ids(prompt)], device="cuda")
     with torch.autocast("cuda", dtype=torch.float16):
         logits = wrapper.next_logits(ids)[0]
@@ -270,6 +298,10 @@ def score_one_prompt(prompt, allowed):
 
 
 def load_adapter(adapter_dir):
+    """Load saved LoRA tensors into the existing default adapter and switch the
+    network to evaluation mode. Return the tensor count and loading message so
+    validation can record which adapter was loaded.
+    """
     state = load_file(Path(adapter_dir) / "adapter_model.safetensors")
     result = set_peft_model_state_dict(network, state, adapter_name="default")
     network.eval()
@@ -277,6 +309,10 @@ def load_adapter(adapter_dir):
 
 
 def direct_eval(system_name, adapter_dir=None, disable_adapter=False):
+    """Run constrained answer-only validation using the base model or a selected
+    adapter. Compare each prediction with its validation reference and return
+    per-question records used to reproduce the original checkpoint scores.
+    """
     if adapter_dir is not None:
         n, result = load_adapter(adapter_dir)
         print(f"{system_name}: loaded {n} adapter tensors")
@@ -317,15 +353,28 @@ subjectesis_direct = direct_eval("subjectesis_direct", adapter_dir=SUBJECTESIS_A
 
 
 def task_accuracy(rows, task):
+    """Return the fraction of correct predictions for one task family. Separating
+    belief and desire makes their unequal question counts visible before
+    calculating the equal-family mean.
+    """
     x = [r for r in rows if r["task"] == task]
     return sum((r["correct"] for r in x)) / len(x)
 
 
 def selection_score(rows):
+    """Average belief accuracy and desire accuracy with equal weight. The
+    historical name refers to validation checkpoint selection; on the final
+    test it is only a reported task-mean score.
+    """
     return (task_accuracy(rows, "belief") + task_accuracy(rows, "desire")) / 2
 
 
 def macro_f1(rows, task):
+    """Compute F1 for each label appearing in the references or predictions of the
+    selected task, then average those values. This preserves the original
+    evaluator convention; the later CPU analysis explicitly fixes the
+    target-class set.
+    """
     x = [r for r in rows if r["task"] == task]
     labels = sorted(
         set((r["reference"] for r in x)) | set((r["prediction"] for r in x))
@@ -342,6 +391,10 @@ def macro_f1(rows, task):
 
 
 def direct_summary(name, rows):
+    """Collect belief and desire accuracy, their equal-weight mean and task macro
+    F1 for one direct condition. Return a named summary suitable for comparing
+    the base and trained adapters.
+    """
     return {
         "system": name,
         "belief_accuracy": task_accuracy(rows, "belief"),
@@ -363,9 +416,15 @@ for m in direct_metrics:
 
 
 def saved_prediction_map(saved):
+    """Index the selected checkpoint validation predictions by record ID. This
+    lets the evaluation compare answers question by question without depending
+    on stored row order.
+    """
     return {r["record_id"]: r["prediction"] for r in saved["predictions"]}
 
 
+# Before developing the structured controller, check that direct answers
+# match the best-checkpoint validation predictions saved during training.
 for name, observed, saved in [
     ("answer-only", answer_direct, ordinary_saved_best),
     ("Subjectesis", subjectesis_direct, subjectesis_saved_best),
@@ -431,7 +490,11 @@ print("Protocol candidate hash:", PROTOCOL_HASH)
 
 
 def extract_first_json_object(text):
-    """Parse the first complete JSON object while respecting quoted braces."""
+    """Locate the first complete brace-delimited object while tracking quoted
+    strings and escaped characters. Decode it as JSON or return None, so
+    surrounding prose can be tolerated without repairing malformed model
+    content.
+    """
     start = text.find("{")
     if start < 0:
         return None
@@ -464,6 +527,10 @@ def extract_first_json_object(text):
 
 
 def generate_text(user_prompt, max_new_tokens):
+    """Generate one structured response greedily with the frozen Qwen model and
+    decode only its continuation. Enforce the input-length limit and requested
+    output-token budget without using gradient updates.
+    """
     text = tok.apply_chat_template(
         [{"role": "user", "content": user_prompt}],
         tokenize=False,
@@ -487,7 +554,11 @@ def generate_text(user_prompt, max_new_tokens):
 
 
 def validate_initial(obj, task, allowed_letters):
-    """Check the initial state schema and allowed values, not semantic truth."""
+    """Check required top-level keys, task fields, allowed values and basic types
+    in an initial generated state. Return a validity flag and reason; passing
+    this schema check does not establish that the belief or its evidence is
+    true.
+    """
     if not isinstance(obj, dict):
         return (False, "not_object")
     required_top = {
@@ -522,7 +593,11 @@ def validate_initial(obj, task, allowed_letters):
 
 
 def validate_review(obj, field):
-    """Check the review schema and selected field, not whether the evidence entails the claim."""
+    """Check that a generated review addresses the selected field and has an
+    allowed decision, updated claim and evidence list. Return a validity flag
+    and reason so malformed updates can be recorded while retaining the
+    previous state.
+    """
     if not isinstance(obj, dict):
         return (False, "not_object")
     required = {"field", "decision", "updated_claim", "evidence", "stop_reason"}
@@ -549,12 +624,19 @@ def validate_review(obj, field):
 
 
 def current_state_for_review(state, task):
-    """Copy the fields relevant to the question task into the review prompt."""
+    """Deep-copy only the fields required by the current question task. Review and
+    finalizer prompts use this task-specific view without sharing mutable state
+    objects or adding reference answers.
+    """
     return {k: copy.deepcopy(state[k]) for k in REQUIRED_FIELDS[task] if k in state}
 
 
 def make_review_prompt(row, state, field):
-    """Render the frozen dialogue, current state and selected field-review instruction."""
+    """Combine the original question, current task state and instruction for one
+    selected field. The same frozen wording is used throughout the review
+    sequence, making each update traceable to the supplied dialogue and prior
+    state.
+    """
     return (
         row["prompt"]
         + "\nCurrent perspective state (may contain mistakes): "
@@ -567,7 +649,11 @@ def make_review_prompt(row, state, field):
 
 
 def finalizer_prediction(row, state):
-    """Use the same constrained answer rule on the state before and after review."""
+    """Build a prompt containing the question and the current state, then select
+    an allowed answer letter from model logits. Applying the same rule before
+    and after review isolates the effect of the updated state on the final
+    answer.
+    """
     prompt = (
         row["prompt"]
         + "\nPerspective state: "
@@ -579,6 +665,11 @@ def finalizer_prediction(row, state):
 
 
 def review_fields(task, state):
+    """Choose the task-relevant review fields from the current proposer value.
+    Desire uses intends_to_watch; belief uses proposer and seen plus
+    recommendation_response, appraisal, or both when the proposer remains
+    unknown.
+    """
     if task == "desire":
         return ["intends_to_watch"]
     fields = ["proposer", "seen"]
@@ -593,10 +684,18 @@ def review_fields(task, state):
 
 
 def normalize_ws(x):
+    """Collapse whitespace in a value after converting it to text. Citation checks
+    use this to ignore formatting differences between a generated quotation and
+    its source turn.
+    """
     return " ".join(str(x).split())
 
 
 def dialogue_turns(row):
+    """Extract numbered dialogue lines from the common prompt into a turn-number
+    lookup. Evidence checks use this lookup to match a generated citation with
+    the actual supplied turn.
+    """
     block = row["prompt"].split("Dialogue:\n", 1)[1].split("\nQuestion:", 1)[0]
     turns = {}
     for line in block.splitlines():
@@ -607,7 +706,11 @@ def dialogue_turns(row):
 
 
 def evidence_binding_audit(evidence, turns):
-    """Audit citation-to-turn string binding after generation; this does not establish entailment."""
+    """Count citations whose turn exists and whose normalized quote equals or
+    contains that source-turn text. This records textual source binding after
+    generation; despite the historical all_exact key, it allows containing text
+    and does not test semantic entailment.
+    """
     if not isinstance(evidence, list):
         return {"items": 0, "valid_items": 0, "all_exact": False}
     valid = 0
@@ -624,6 +727,8 @@ def evidence_binding_audit(evidence, turns):
             continue
         q = normalize_ws(quote)
         source = normalize_ws(turns[turn])
+        # The recorded rule accepts a quote containing the full source turn.
+        # This checks textual binding only, not whether the turn supports the claim.
         if q == source or q.endswith(source) or source in q:
             valid += 1
     return {
@@ -634,7 +739,10 @@ def evidence_binding_audit(evidence, turns):
 
 
 def state_contract_audit(state, task, turns):
-    """Audit unknown and known claim contracts after inference without changing predictions."""
+    """Check each field against the known/unknown evidence rules and legal turn
+    numbers. Return per-field flags without altering predictions, keeping
+    structural consistency separate from semantic correctness.
+    """
     results = {}
     for field in REQUIRED_FIELDS[task]:
         claim = state.get(field, {})
@@ -659,6 +767,11 @@ def state_contract_audit(state, task, turns):
 
 
 def run_structured_case(row):
+    """Run one sequential validation case through initial-state construction,
+    no-review finalization and bounded field review. Update only valid claims,
+    select later belief fields from the reviewed proposer, and return both
+    answers plus the complete state/evidence trace.
+    """
     ref = validation_refs[row["record_id"]]["answer"]
     allowed = list(row["choices"].keys())
     raw_initial = generate_text(
@@ -769,6 +882,10 @@ validation_order = [r["record_id"] for r in validation_rows]
 
 
 def _chat_input_ids(user_prompt):
+    """Apply the frozen chat template and encode one prompt with thinking
+    disabled. Enforce the input-length limit so batching never silently removes
+    dialogue or review context.
+    """
     text = tok.apply_chat_template(
         [{"role": "user", "content": user_prompt}],
         tokenize=False,
@@ -784,9 +901,10 @@ def _chat_input_ids(user_prompt):
 
 
 def _generate_batch_once(prompts, max_new_tokens):
-    """Same greedy decoding as Cell 4,
-    but multiple independent prompts run
-    simultaneously on the A100."""
+    """Left-pad independent prompts, mask the padding and run one greedy
+    generation batch. Return only newly generated text in prompt order, keeping
+    each example context separate while sharing GPU work.
+    """
     encoded = [_chat_input_ids(p) for p in prompts]
     pad_id = tok.pad_token_id
     if pad_id is None:
@@ -824,11 +942,10 @@ def _generate_batch_once(prompts, max_new_tokens):
 def batched_generate_text(
     prompts, max_new_tokens, preferred=PREFERRED_GENERATION_BATCH
 ):
-    """Dynamic A100 inference batching.
-
-    8 -> 4 -> 2 -> 1 only if OOM.
-
-    Does NOT change prompts or decoding."""
+    """Generate responses in batches and halve a batch after an out-of-memory
+    error until it fits. Preserve prompt order and decoding settings, and raise
+    the error if even one example cannot fit.
+    """
     if not prompts:
         return []
     outputs = [None] * len(prompts)
@@ -925,6 +1042,10 @@ for result in structured_smoke:
 
 
 def save_progress():
+    """Save completed validation records in their original order to local storage
+    and Google Drive using temporary files. Store protocol and checkpoint
+    metadata alongside them so a later session can resume the same evaluation.
+    """
     ordered = [done[rid] for rid in validation_order if rid in done]
     PARTIAL_LOCAL.parent.mkdir(parents=True, exist_ok=True)
     local_tmp = PARTIAL_LOCAL.with_suffix(".tmp")
@@ -952,7 +1073,11 @@ print(f"Persistent starting progress: {len(done)}/319")
 
 
 def process_chunk(rows):
-    """Run the recorded bounded field-review schedule on independent examples."""
+    """Run the same bounded controller on several independent validation
+    questions, batching one review step at a time. Preserve each initial state
+    for the no-review comparison, apply valid updates and return answers,
+    review traces and evidence checks with validation references for reporting.
+    """
     raw_initials = batched_generate_text(
         [row["subjectesis_prompt"] for row in rows],
         PROTOCOL_CONFIG["initial_max_new_tokens"],
@@ -978,6 +1103,8 @@ def process_chunk(rows):
             "state_after": None,
             "reviews": [],
         }
+        # Keep the invalid case in the result set with missing predictions.
+        # Do not repair its state using a reference answer.
         if not valid_initial:
             work.append(
                 {"row": row, "result": result, "state": None, "plan": [], "index": 0}
@@ -1016,9 +1143,13 @@ def process_chunk(rows):
                 "raw": raw,
                 "parsed": obj if valid else None,
             }
+            # Apply every schema-valid updated claim, even when the decision is
+            # preserve, because evidence or rationale can change without changing its value.
             if valid:
                 w["state"][field] = copy.deepcopy(obj["updated_claim"])
             w["result"]["reviews"].append(review_record)
+            # Choose later fields from the reviewed proposer. A recommender
+            # requires response review; a seeker requires appraisal; unknown requires both.
             if w["row"]["task"] == "belief" and field == "proposer":
                 prop = w["state"].get("proposer", {}).get("value")
                 if prop == "recommender":
@@ -1092,11 +1223,19 @@ DRIVE_REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def accuracy_from_structured(rows, key, task):
+    """Calculate task accuracy using the requested answer field in the structured
+    records. Missing or invalid predictions compare unequal to the reference
+    and remain in the denominator.
+    """
     x = [r for r in rows if r["task"] == task]
     return sum((r.get(key) == r["reference"] for r in x)) / len(x)
 
 
 def structured_summary(key):
+    """Summarize one structured answer stage with belief accuracy, desire accuracy
+    and their mean. Selecting the before-review or after-review key provides
+    directly comparable stage results.
+    """
     return {
         "system": key,
         "belief_accuracy": accuracy_from_structured(structured_results, key, "belief"),
@@ -1164,6 +1303,11 @@ source_binding = {
 
 
 def dialogue_bootstrap_difference(rows_a, rows_b, metric_name, reps=5000, seed=42):
+    """Pair two validation conditions by record ID and resample complete dialogues
+    to estimate their task-mean accuracy difference. Return the observed
+    difference and original sorted-percentile bounds from valid samples,
+    preserving dependence between questions from the same dialogue.
+    """
     a = {r["record_id"]: r for r in rows_a}
     b = {r["record_id"]: r for r in rows_b}
     if set(a) != set(b):
@@ -1185,6 +1329,10 @@ def dialogue_bootstrap_difference(rows_a, rows_b, metric_name, reps=5000, seed=4
     dialogues = sorted(by_dialogue)
 
     def score(sample, key):
+        """Calculate equal-weight belief/desire accuracy for one resampled set and
+        one system correctness field. Return None if either task is absent,
+        allowing the outer bootstrap to skip that incomplete draw.
+        """
         vals = {}
         for task in ["belief", "desire"]:
             x = [r for r in sample if r["task"] == task]
@@ -1218,6 +1366,10 @@ def dialogue_bootstrap_difference(rows_a, rows_b, metric_name, reps=5000, seed=4
 
 
 def structured_as_direct(key, name):
+    """Convert a chosen structured answer stage into the common per-question
+    prediction format. This lets the same paired comparison code evaluate
+    direct answers, no-review answers and reviewed answers.
+    """
     out = []
     for r in structured_results:
         pred = r.get(key)

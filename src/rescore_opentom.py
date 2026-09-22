@@ -1,5 +1,9 @@
-"""Correct OpenToM metadata and rescore already-frozen predictions on CPU.
-Execute as a script in the recorded Colab environment. The model and adapters are frozen.
+"""Reproduce corrected OpenToM scores from already saved predictions.
+
+Rebuild location metadata from explicit keys in the pinned dataset, then parse
+answers, calculate strict metrics and estimate story-level bootstrap intervals.
+The correction changes scoring metadata rather than model answers, and uses CPU
+calculations with the original Drive file layout.
 """
 
 from project_setup import mount_drive, prepare_project
@@ -90,6 +94,10 @@ EXPECTED_COUNTS = {
 
 
 def family_detail(family, q):
+    """Split multihop questions into fullness and accessibility subfamilies using
+    their question wording. Other family names pass through unchanged, giving
+    the scorer the appropriate label set for each question.
+    """
     if family.startswith("multihop"):
         low = q["question"].lower()
         if "fullness" in low:
@@ -101,6 +109,10 @@ def family_detail(family, q):
 
 
 def corrected_plot_info(story_id):
+    """Require and read the five explicit plot metadata keys for one story.
+    Returning named fields avoids the dictionary-order mistake that previously
+    made some location references unscorable.
+    """
     p = meta[str(story_id)]["plot_info"]
     required = {"mover", "observer", "eoi", "original_place", "move_to_place"}
     if not required.issubset(p):
@@ -115,6 +127,10 @@ def corrected_plot_info(story_id):
 
 
 def build_records(story_ids, include_answers):
+    """Reconstruct the originally selected stories and questions using corrected
+    named location metadata. Verify family counts and optionally add reference
+    answers, without regenerating or modifying any model predictions.
+    """
     rows = []
     for sid in map(str, story_ids):
         if sid not in meta:
@@ -144,6 +160,8 @@ def build_records(story_ids, include_answers):
     return rows
 
 
+# Rebuild metadata for the same selected questions. The frozen prediction
+# files remain the evidence being scored, so no new GPU inference is needed.
 corrected_inputs = build_records(FINAL_IDS, include_answers=False)
 corrected_refs_full = build_records(FINAL_IDS, include_answers=True)
 if len(corrected_inputs) != 621 or len(corrected_refs_full) != 621:
@@ -153,7 +171,10 @@ CORRECTED_REF_FILE = TRANSFER_DIR / "final_references_corrected.jsonl"
 
 
 def write_jsonl(path, rows):
-    """Write the records in order, one JSON object per line."""
+    """Write corrected records in order as one UTF-8 JSON object per line. These
+    files preserve a readable record of the metadata and references used for
+    rescoring.
+    """
     with Path(path).open("w", encoding="utf8") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
@@ -208,7 +229,9 @@ from sklearn.metrics import f1_score
 
 
 def read_jsonl(path):
-    """Read one JSON record per non-empty line, preserving file order."""
+    """Load each non-empty JSONL line as a record. The rescoring stage uses these
+    saved inputs and predictions rather than calling the model again.
+    """
     return [
         json.loads(x)
         for x in Path(path).read_text(encoding="utf8").splitlines()
@@ -242,6 +265,10 @@ for name, rows in {
 
 
 def remove_determiner(text):
+    """Lowercase location text and remove a leading article. This normalizes
+    reference place names before comparing them with the original and moved
+    locations.
+    """
     text = str(text).strip().lower()
     for det in ["a ", "an ", "the "]:
         if text.startswith(det):
@@ -250,6 +277,11 @@ def remove_determiner(text):
 
 
 def lexical_overlap(pred, location):
+    """Return the fraction of location words matched by distinct prediction words
+    after basic text normalization. The fine-location parser compares this
+    score for the original and moved places and retains a tie as an ambiguous
+    answer.
+    """
     pred = (
         str(pred).lower().replace("_", " ").replace("'s", "").replace(".", "").split()
     )
@@ -266,6 +298,11 @@ def lexical_overlap(pred, location):
 
 
 def normalize_accessibility_reference(answer):
+    """Normalize the recorded accessibility reference format, including singleton
+    lists and the pipe-separated equality convention. Return None when a list
+    cannot be resolved to one usable reference so the scorer can flag it as
+    unscorable.
+    """
     if isinstance(answer, list):
         answer = [x for x in answer if x != "corrupted"]
         if len(answer) != 1:
@@ -278,6 +315,11 @@ def normalize_accessibility_reference(answer):
 
 
 def parse_prediction(prediction, ref):
+    """Map raw answer text and its reference to numeric labels using the fixed
+    family-specific parsing rules. Return the reference label, prediction label
+    and allowed labels, keeping malformed or ambiguous predictions distinct
+    from valid answers.
+    """
     family = ref["family"]
     detail = ref["family_detail"]
     pred = "" if prediction is None else str(prediction).strip()
@@ -372,6 +414,11 @@ def parse_prediction(prediction, ref):
 
 
 def score_rows(rows, system, prediction_key="prediction"):
+    """Join each saved prediction to the corrected reference by ID and record
+    parsed labels, correctness and parser status. Retain raw answers alongside
+    these fields so the corrected scores can be traced to the original
+    generation.
+    """
     out = []
     for r in rows:
         ref = REFS[r["record_id"]]
@@ -435,6 +482,11 @@ FAMILY_LABELS = {
 
 
 def strict_target_macro_f1(rows, labels):
+    """Compute per-class F1 over the specified target labels and average them,
+    assigning zero to an undefined class score. Only unscorable references are
+    excluded; malformed predictions still produce false negatives for their
+    true class.
+    """
     rows = [r for r in rows if r["scorable"]]
     vals = []
     for lab in labels:
@@ -447,7 +499,13 @@ def strict_target_macro_f1(rows, labels):
 
 
 def metric_block(rows, family):
+    """Summarize one question family with strict accuracy, fixed-target macro F1
+    and parser counts. Also retain historical valid-only comparison scores,
+    while strict metrics continue to count malformed predictions as errors.
+    """
     sc = [r for r in rows if r["scorable"]]
+    # The valid-only figures reproduce a historical comparison convention.
+    # The strict metrics below retain malformed predictions as errors.
     valid = [r for r in sc if not r["corrupt"]]
     labels = FAMILY_LABELS[family]
     strict_acc = sum((r["correct"] for r in sc)) / len(sc) if sc else None
@@ -478,6 +536,10 @@ def metric_block(rows, family):
 
 
 def summarize(name, rows):
+    """Combine family summaries into one system result with pooled strict accuracy
+    and mean family macro F1. Include scorable-reference and corrupt-prediction
+    counts so the denominator and parsing effects remain visible.
+    """
     fam = {
         f: metric_block([r for r in rows if r["family_detail"] == f], f)
         for f in FAMILY_ORDER
@@ -527,6 +589,8 @@ if len(STORY_IDS) != 27:
 story_index = {sid: i for i, sid in enumerate(STORY_IDS)}
 N_STORIES = len(STORY_IDS)
 rng = random.Random(BOOTSTRAP_SEED)
+# One shared matrix of story multiplicities is applied to every system.
+# Paired differences therefore compare systems on exactly the same resamples.
 BOOT_COUNTS = np.zeros((BOOTSTRAP_REPETITIONS, N_STORIES), dtype=np.int16)
 for b in range(BOOTSTRAP_REPETITIONS):
     sampled = [rng.randrange(N_STORIES) for _ in range(N_STORIES)]
@@ -534,6 +598,10 @@ for b in range(BOOTSTRAP_REPETITIONS):
 
 
 def build_story_stats(rows):
+    """Aggregate correct counts and per-class reference, prediction and
+    true-positive counts by story. These compact arrays support story-level
+    bootstrap calculations without repeatedly copying individual question rows.
+    """
     correct = np.zeros(N_STORIES, float)
     n = np.zeros(N_STORIES, float)
     fam = {}
@@ -567,6 +635,10 @@ STORY_STATS = {name: build_story_stats(rows) for name, rows in SYSTEMS.items()}
 
 
 def bootstrap_system(stats):
+    """Apply the shared bootstrap story-count matrix to one system aggregated
+    statistics. Return sampled accuracy and mean family macro F1, preserving
+    within-story dependence and paired resampling across systems.
+    """
     correct = BOOT_COUNTS @ stats["correct"]
     n = BOOT_COUNTS @ stats["n"]
     accuracy = np.divide(correct, n, out=np.zeros_like(correct, float), where=n > 0)
@@ -589,6 +661,10 @@ BOOT_SYSTEM = {name: bootstrap_system(STORY_STATS[name]) for name in SYSTEMS}
 
 
 def ci(x):
+    """Return the 2.5th and 97.5th percentiles of a sampled metric or difference.
+    These are the central 95 percent story-bootstrap bounds used in the
+    corrected result tables.
+    """
     return [float(np.percentile(x, 2.5)), float(np.percentile(x, 97.5))]
 
 

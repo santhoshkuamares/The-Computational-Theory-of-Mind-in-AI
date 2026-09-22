@@ -6,6 +6,11 @@ from common import *
 
 
 def encode(row, tok, max_length):
+    """Apply the Qwen chat template to a user message and its supervised assistant
+    completion. Verify that the prompt tokens are an unchanged prefix and that
+    nothing needs truncation, then return all token IDs and the boundary where
+    supervision starts.
+    """
     messages = row["messages"]
     if [m["role"] for m in messages] != ["user", "assistant"]:
         raise ValueError("Expected user + assistant")
@@ -19,6 +24,8 @@ def encode(row, tok, max_length):
         raise ValueError("Chat-template prefix mismatch: " + row["example_id"])
     prompt_ids = tok.encode(prefix, add_special_tokens=False)
     ids = tok.encode(full, add_special_tokens=False)
+    # The loss mask depends on an exact prompt/completion boundary.
+    # Do not guess a boundary if joint tokenization changes the prefix.
     if ids[: len(prompt_ids)] != prompt_ids:
         raise ValueError("Token boundary mismatch: " + row["example_id"])
     if len(ids) > max_length:
@@ -33,6 +40,11 @@ def encode(row, tok, max_length):
 
 
 def run(root):
+    """Create or reuse checked token arrays for each requested training condition
+    and save the tokenizer. Also tokenize answer-only validation prompts,
+    keeping reference labels out of those model inputs and recording lengths
+    and supervised-token counts.
+    """
     import numpy as np
     from transformers import AutoTokenizer
 
@@ -105,6 +117,8 @@ def run(root):
         meta["conditions"][name] = report
         print(name, report, flush=True)
         del rows, ids_flat
+    # Validation needs input tokens and option letters, not supervised
+    # completion labels. Reference answers are opened by the scoring stage.
     vpath = root / "preparation/data/evaluation/validation_inputs.jsonl"
     expected = read_json(root / "preparation/data/checksums.json")[
         "evaluation/validation_inputs.jsonl"

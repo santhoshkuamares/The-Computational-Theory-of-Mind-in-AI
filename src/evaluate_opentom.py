@@ -1,5 +1,9 @@
-"""Generate the frozen OpenToM predictions; run rescore_opentom.py afterward for corrected metrics.
-Execute as a script in the recorded Colab environment. The model and adapters are frozen.
+"""Generate frozen-model OpenToM transfer predictions.
+
+Select the recorded smoke and final stories, run the three direct model
+conditions, and produce paired no-review/review answers from shared initial
+states. This script performs no OpenToM fine-tuning. Run rescore_opentom.py
+afterward to reproduce the corrected metrics from the saved predictions.
 """
 
 from project_setup import mount_drive, prepare_project
@@ -26,6 +30,11 @@ for p in [SUB_ZIP, ANS_ZIP]:
 
 
 def verify_archive(path, condition):
+    """Verify the completion record and selected adapter files against the archive
+    manifest. Require completed training with the expected example exposure and
+    no recorded test scoring, then return the checkpoint metadata used by
+    transfer evaluation.
+    """
     with zipfile.ZipFile(path) as z:
         manifest = json.loads(z.read("recovery_manifest.json"))["files"]
         cpath = f"runs/{condition}/completed.json"
@@ -100,9 +109,15 @@ assert len(story_ids) == 596
 
 
 def rank_story(sid):
+    """Hash the fixed selection seed together with a story ID to obtain a
+    repeatable ordering key. Sorting these keys selects smoke and final stories
+    without using their answers or observed model performance.
+    """
     return hashlib.sha256((SELECTION_SEED + "|" + str(sid)).encode()).hexdigest()
 
 
+# The story subset is determined by the fixed hash ordering. Smoke stories
+# are excluded from the final 27-story, 621-question transfer set.
 ranked = sorted(story_ids, key=lambda sid: (rank_story(sid), sid))
 SMOKE_IDS = ranked[:N_SMOKE]
 FINAL_IDS = ranked[N_SMOKE : N_SMOKE + N_FINAL]
@@ -119,6 +134,10 @@ COUNTS = {
 
 
 def family_detail(family, q):
+    """Split multihop questions into fullness and accessibility subfamilies using
+    their question wording. Other family names pass through unchanged, giving
+    the scorer the appropriate label set for each question.
+    """
     if family.startswith("multihop"):
         text = q["question"].lower()
         if "fullness" in text:
@@ -131,6 +150,10 @@ def family_detail(family, q):
 
 # Corrected lookup: dictionary insertion order is not a metadata schema.
 def plot_info(story_id):
+    """Read the mover, observer, entity and two locations by their explicit
+    metadata keys. This corrects the earlier assumption that dictionary
+    insertion order identified those fields reliably.
+    """
     p = meta[story_id]["plot_info"]
     return (
         p["mover"],
@@ -142,6 +165,11 @@ def plot_info(story_id):
 
 
 def build(ids, include_answers):
+    """Expand selected stories into question records with narrative, family and
+    corrected location metadata. Include answer labels only when requested for
+    the separate reference records, and verify each story family has its
+    expected number of questions.
+    """
     rows = []
     for sid in ids:
         narrative = meta[sid]["narrative"]
@@ -179,7 +207,10 @@ REF_FILE = INPUT_DIR / "final_references.jsonl"
 
 
 def write_jsonl(path, rows):
-    """Write the records in order, one JSON object per line."""
+    """Write each input or reference record as one UTF-8 JSON line in its existing
+    order. Keeping these records separate allows inference to consume the
+    answer-free input file.
+    """
     with path.open("w", encoding="utf8") as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -229,6 +260,10 @@ import shutil
 
 
 def run(cmd, env=None):
+    """Print and execute one setup command, raising an error if it fails. This
+    keeps dependency and model-download failures from being mistaken for a
+    completed evaluation stage.
+    """
     print("\n>>>", " ".join(map(str, cmd)), flush=True)
     subprocess.run(list(map(str, cmd)), check=True, env=env)
 
@@ -276,6 +311,10 @@ ADAPTER_DIR.mkdir(exist_ok=True)
 
 
 def extract_adapter(archive, condition, destination):
+    """Copy the selected condition best-adapter directory from its recovery
+    archive into a fresh local folder. The transfer comparison loads these
+    completed checkpoints rather than fitting adapters on OpenToM.
+    """
     destination = Path(destination)
     if destination.exists():
         shutil.rmtree(destination)
@@ -331,12 +370,20 @@ network.config.use_cache = True
 
 
 def load_adapter(path):
+    """Load one saved adapter into the existing model and switch to evaluation
+    mode. This reuses the same base backbone for the trained direct and
+    structured transfer conditions.
+    """
     state = load_file(Path(path) / "adapter_model.safetensors")
     set_peft_model_state_dict(network, state, adapter_name="default")
     network.eval()
 
 
 def instruction(row):
+    """Choose the required answer format for a question family, such as yes/no,
+    location, fullness or attitude. Restricting the requested wording makes raw
+    generations compatible with the recorded OpenToM parser.
+    """
     fam = row["family"]
     q = row["question"].lower()
     if fam.startswith("location_cg"):
@@ -355,6 +402,10 @@ def instruction(row):
 
 
 def direct_prompt(row):
+    """Combine the story, question and family-specific answer instruction into a
+    direct prompt. The base and both trained adapters receive this same prompt
+    format for the direct transfer comparison.
+    """
     return (
         "Story:\n"
         + row["narrative"]
@@ -369,6 +420,8 @@ def direct_prompt(row):
 INITIAL = '\nBuild a subject-relative mental-state record for the question.\n\nReturn exactly one JSON object:\n{\n  "perspective_holder": string,\n  "nested_perspective": string or null,\n  "mental_state_claim": string,\n  "evidence_sentences": [integer sentence numbers],\n  "uncertainty": string,\n  "answer": string\n}\n\nUse only the story.\nTrack what the queried perspective could know, believe, perceive, or feel.\nFor second-order questions, use nested_perspective for the inner mental-state holder.\nDo not invent unsupported facts.\n'
 REVIEW = '\nReview the current mental-state record against the story.\n\nReturn exactly one JSON object:\n{\n  "decision": "revise" or "preserve" or "retain_unknown",\n  "updated_mental_state_claim": string,\n  "evidence_sentences": [integer sentence numbers],\n  "uncertainty": string,\n  "reason": string\n}\n\nRevise unsupported claims.\nDo not use information unavailable to the queried perspective.\n'
 FINALIZER = "\nUse the mental-state record only as evidence bookkeeping.\nAnswer the original question using the requested answer format.\nDo not explain.\n"
+# OpenToM uses one whole-record review with no additional fine-tuning.
+# Its state fields and output formats differ from the RecToM controller.
 PROTOCOL = {
     "version": "subjectesis_opentom_transfer_v1",
     "opentom_commit": OTOM_COMMIT,
@@ -393,12 +446,20 @@ print("OpenToM protocol:", PROTOCOL_HASH)
 
 
 def numbered_story(text):
+    """Split a narrative at sentence-ending punctuation and number the resulting
+    sentences. Return both the numbered text and sentence count so structured
+    prompts can cite evidence and validators can check citation bounds.
+    """
     parts = [x.strip() for x in re.split("(?<=[.!?])\\s+", text.strip()) if x.strip()]
     return ("\n".join((f"{i + 1}: {s}" for i, s in enumerate(parts))), len(parts))
 
 
 def state_prompt(row):
-    """Build the perspective-state prompt used in the structured supervision."""
+    """Ask the frozen model to build a subject-relative mental-state record from a
+    numbered story. Include the question and answer-format instruction so the
+    state addresses the queried perspective, including nested perspectives when
+    relevant.
+    """
     story, _ = numbered_story(row["narrative"])
     return (
         "Numbered story:\n"
@@ -413,7 +474,10 @@ def state_prompt(row):
 
 
 def review_prompt(row, state):
-    """Ask for evidence-sensitive review of the selected state field."""
+    """Present the numbered story, question and current mental-state record for
+    one review. This OpenToM protocol reviews the whole claim once, unlike the
+    bounded sequence of field reviews used for RecToM.
+    """
     story, _ = numbered_story(row["narrative"])
     return (
         "Numbered story:\n"
@@ -428,6 +492,10 @@ def review_prompt(row, state):
 
 
 def final_prompt(row, state):
+    """Append a mental-state record to the direct question prompt and request the
+    final short answer. Using this same format before and after review makes
+    the two structured conditions comparable.
+    """
     return (
         direct_prompt(row)
         + "\n\nMental-state record:\n"
@@ -438,6 +506,10 @@ def final_prompt(row, state):
 
 
 def chat(prompt):
+    """Apply the Qwen user-message template with a generation marker and thinking
+    disabled. Return text for tokenization so all generated responses use the
+    same chat formatting.
+    """
     return tok.apply_chat_template(
         [{"role": "user", "content": prompt}],
         tokenize=False,
@@ -447,6 +519,11 @@ def chat(prompt):
 
 
 def generate(prompts, max_new_tokens, preferred=8):
+    """Generate ordered greedy completions from left-padded, attention-masked
+    prompt batches. Halve the batch after GPU out-of-memory errors and return
+    only continuation text, preserving the frozen prompts and output-token
+    budget.
+    """
     results = []
     start = 0
     while start < len(prompts):
@@ -499,6 +576,10 @@ def generate(prompts, max_new_tokens, preferred=8):
 
 
 def first_json(text):
+    """Extract and decode the first balanced JSON object while respecting quoted
+    braces and escapes. Return None if the object is absent or cannot be
+    decoded, allowing malformed generations to be recorded.
+    """
     start = text.find("{")
     if start < 0:
         return None
@@ -530,6 +611,11 @@ def first_json(text):
 
 
 def valid_initial(obj, row):
+    """Check that an initial record contains the required keys and a list of
+    in-range sentence citations. This is a limited structural check; it does
+    not validate every field type or establish that the mental-state claim
+    follows from the story.
+    """
     if not isinstance(obj, dict):
         return False
     keys = {
@@ -549,6 +635,11 @@ def valid_initial(obj, row):
 
 
 def valid_review(obj, row):
+    """Check the review keys, decision and sentence-number bounds before applying
+    its update. This validator assumes evidence_sentences is iterable and
+    checks structural form rather than whether the cited evidence supports the
+    claim.
+    """
     if not isinstance(obj, dict):
         return False
     keys = {
@@ -620,6 +711,10 @@ PRED_DIR.mkdir(exist_ok=True)
 
 
 def save_jsonl(path, rows):
+    """Write records to a temporary JSONL file and replace the destination after
+    the write completes. Transfer inference uses this to persist completed
+    chunks without leaving a half-written result file.
+    """
     tmp = path.with_suffix(".tmp")
     with tmp.open("w", encoding="utf8") as f:
         for row in rows:
@@ -628,6 +723,10 @@ def save_jsonl(path, rows):
 
 
 def load_jsonl(path):
+    """Load non-empty JSONL records, returning an empty list when the file does
+    not exist. This supports both a fresh transfer run and continuation from
+    saved predictions.
+    """
     if not path.exists():
         return []
     return [
@@ -636,6 +735,10 @@ def load_jsonl(path):
 
 
 def direct_system(name, adapter=None, base=False):
+    """Generate the missing direct predictions for one model condition and save
+    them after each chunk. Reuse saved record IDs, optionally disable adapters
+    for the base condition, and require all 621 predictions before returning.
+    """
     path = PRED_DIR / f"{name}.jsonl"
     done_rows = load_jsonl(path)
     done = {r["record_id"]: r for r in done_rows}
@@ -682,6 +785,10 @@ structured_done = {r["record_id"]: r for r in load_jsonl(STRUCTURED_PATH)}
 
 
 def initial_state_only(obj):
+    """Copy perspective, claim, evidence and uncertainty fields from an initial
+    response while excluding its proposed answer. The finalizer then selects
+    its answer from the story and this state representation.
+    """
     return {
         "perspective_holder": obj["perspective_holder"],
         "nested_perspective": obj["nested_perspective"],
@@ -692,7 +799,13 @@ def initial_state_only(obj):
 
 
 def apply_review(state, review):
+    """Deep-copy the current state and replace its claim, evidence sentences and
+    uncertainty with the valid review output. Perspective-holder fields are
+    retained, and even a preserve decision can update the record contents.
+    """
     out = copy.deepcopy(state)
+    # Merge content from a valid review regardless of the decision label.
+    # A preserve label is not a guarantee that the generated text is unchanged.
     out["mental_state_claim"] = review["updated_mental_state_claim"]
     out["evidence_sentences"] = list(review["evidence_sentences"])
     out["uncertainty"] = review["uncertainty"]

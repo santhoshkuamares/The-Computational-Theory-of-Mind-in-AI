@@ -1,4 +1,9 @@
-"""Revision-4 data preparation: packets."""
+"""Group training source questions for the recorded annotation process.
+
+Questions are grouped by dialogue and target movie with their available context
+cutoffs. build_full.py uses the resulting keys to attach the fixed annotations;
+these packets do not include the reference answer labels.
+"""
 
 import sys, json, re
 from pathlib import Path
@@ -10,6 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def title(r):
+    """Extract the target movie title by removing the fixed RecToM question prefix
+    and question mark. This connects belief and desire questions about the same
+    movie during annotation preparation.
+    """
     q = r["question"]
     return (
         q.removeprefix(
@@ -21,10 +30,19 @@ def title(r):
 
 
 def norm(x):
+    """Collapse repeated whitespace and case-fold text for matching. This groups
+    equivalent title spellings without changing the original title shown in
+    source records.
+    """
     return " ".join(x.split()).casefold()
 
 
 def groups():
+    """Group training questions by dialogue and movie, recording each question
+    cutoff and the longest available dialogue prefix. Return source packets
+    without answer labels so the recorded annotations can be attached to the
+    appropriate dialogue/movie target.
+    """
     rows, s = load_sources(ROOT)
     by = {}
     for r in rows:

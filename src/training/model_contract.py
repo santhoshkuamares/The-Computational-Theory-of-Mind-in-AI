@@ -1,7 +1,17 @@
-"""Checks and helpers used by the original training pipeline."""
+"""Check that the intended pretrained text weights were loaded.
+
+The Qwen checkpoint includes shared embedding/output weights and may also
+contain unused non-text modules. The check distinguishes those expected cases
+from missing or incompatible text-model weights.
+"""
 
 
 def verify_loading(info, tied_embeddings):
+    """Check the weight-loading report and require genuinely shared input and
+    output embeddings. Allow the shared output-head alias and unused vision or
+    multi-token-prediction weights, but reject missing or mismatched text
+    weights before returning a small verification summary.
+    """
     if not tied_embeddings:
         raise RuntimeError("Qwen3.5-4B requires tied input/output embeddings.")
     missing = set(info.get("missing_keys") or [])

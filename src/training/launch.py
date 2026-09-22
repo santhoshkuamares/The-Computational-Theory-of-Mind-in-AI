@@ -6,6 +6,10 @@ from common import *
 
 
 def child_env(root):
+    """Build the environment passed to the original two-T4 training processes. Set
+    cache, communication and logging options explicitly and remove conflicting
+    framework settings so subprocesses use the recorded runtime assumptions.
+    """
     env = dict(os.environ)
     env.update(
         {
@@ -38,6 +42,11 @@ def child_env(root):
 
 
 def stream(command, logfile, env):
+    """Run a training command while copying its combined output to the terminal
+    and a log file. A background heartbeat shows long operations are alive, and
+    interruption handling stops the child process group before returning or
+    raising an error.
+    """
     logfile = Path(logfile)
     logfile.parent.mkdir(exist_ok=True, parents=True)
     with logfile.open("a", buffering=1) as f:
@@ -54,6 +63,11 @@ def stream(command, logfile, env):
         done = threading.Event()
 
         def heartbeat():
+            """Print elapsed time every 30 seconds while the child process is
+            running. This provides progress visibility during operations that
+            otherwise produce no log output, and stops when the completion
+            event is set.
+            """
             start = time.monotonic()
             while not done.wait(30):
                 print(
@@ -85,6 +99,10 @@ def stream(command, logfile, env):
 
 
 def run(root, smoke_only=False):
+    """Launch the configured conditions through torchrun with two processes and
+    stream their logs. Stop after a resumable pause and package recovery
+    outputs in the finalization block, including when training raises an error.
+    """
     root = Path(root)
     c = load_config(root)
     py = root / "torch_env/bin/python"

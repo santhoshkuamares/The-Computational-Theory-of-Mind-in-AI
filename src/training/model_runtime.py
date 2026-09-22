@@ -22,7 +22,11 @@ TARGETS = [
 
 
 def build_network(root, c, local_rank, download_path):
-    """Load the pinned Qwen text model in NF4 and attach the recorded FP32 LoRA parameters."""
+    """Load the pinned Qwen text backbone in four-bit NF4 and attach LoRA modules
+    to the recorded projection layers. Verify weight loading, tied embeddings
+    and GPU placement, then return a model whose base weights are frozen and
+    only LoRA parameters are trainable.
+    """
     from transformers import AutoConfig, Qwen3_5ForCausalLM, BitsAndBytesConfig
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     from transformers.models.qwen3_5 import modeling_qwen3_5 as m
@@ -96,6 +100,8 @@ def build_network(root, c, local_rank, download_path):
     write_json(
         Path(root) / "reports" / f"weight_contract_rank{local_rank}.json", loading_check
     )
+    # Prepare the quantized frozen backbone for adapter training. Gradient
+    # checkpointing trades extra computation for lower activation memory.
     model = prepare_model_for_kbit_training(
         model,
         use_gradient_checkpointing=True,
@@ -109,6 +115,8 @@ def build_network(root, c, local_rank, download_path):
         != model.get_output_embeddings().weight.data_ptr()
     ):
         raise RuntimeError("Embedding tying was lost during k-bit preparation")
+    # LoRA adds small trainable matrices to these projection layers.
+    # The pretrained backbone remains frozen; rank and scale come from settings.
     lora = LoraConfig(
         r=c["rank"],
         lora_alpha=c["alpha"],
@@ -155,7 +163,11 @@ def build_network(root, c, local_rank, download_path):
 
 
 def frozen_sample(network):
-    """Hash sampled frozen weights for a smoke diagnostic; this is not a full weight comparison."""
+    """Hash the first and last 16 stored values of each frozen parameter tensor.
+    The smoke check compares these samples before and after an update to detect
+    unexpected changes, but this is not a comparison of every base-model
+    weight.
+    """
     h = hashlib.sha256()
     tensors = 0
     for name, p in network.named_parameters():

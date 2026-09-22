@@ -1,5 +1,10 @@
-"""Frozen-output CPU analysis: supplementary.
-Run from the repository root. No model inference or adapter training occurs."""
+"""Explain benchmark errors and review behavior using saved records.
+
+Run analyse.py first, then this script to create subgroup scores, parsing
+checks, state-answer comparisons and an error casebook. The review-policy
+replay selects between already saved answers and is an exploratory analysis,
+not a newly evaluated or deployment-selected policy.
+"""
 
 from project_setup import ensure_analysis_inputs
 
@@ -38,6 +43,12 @@ CLAIMS = {
 
 
 def run(root):
+    """Analyze frozen predictions by subgroup, inspect state-answer agreement and
+    parsing, and collect cases with specified disagreements or changes. Replay
+    an uncertainty-triggered selection of already-saved review branches as an
+    exploratory CPU analysis, then save its tables and casebook without new
+    inference.
+    """
     out = root / "results"
     subgroup = []
     replay = []
@@ -150,6 +161,9 @@ def run(root):
                             and val == "3",
                         }
                     )
+            # Select all cases satisfying these error/change criteria for inspection.
+            # This casebook is deliberately selected, so its case frequencies do not
+            # estimate prevalence in an unselected population.
             changed = proc.loc[rid, "transition"] in [
                 "right_to_wrong",
                 "wrong_to_right",
@@ -181,6 +195,8 @@ def run(root):
                         "structured": r,
                     }
                 )
+        # Replay a rule by choosing among answers already produced in the study.
+        # This does not run an adaptive controller or validate a new deployment policy.
         pred = np.where(df.trigger, df.subjectesis_review, df.subjectesis_no_review)
         groups = sorted(df.cluster.unique())
         counts = bootstrap_counts(len(groups))

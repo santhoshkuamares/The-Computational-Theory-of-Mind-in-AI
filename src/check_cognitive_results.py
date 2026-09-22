@@ -27,13 +27,19 @@ SYSTEMS = [
 
 
 def read_rows(path):
-    """Read the saved question records in their original order."""
+    """Read non-empty JSONL lines into records in file order. These saved records
+    provide the individual observations used to check the cognitive summaries.
+    """
     with path.open() as source:
         return [json.loads(line) for line in source if line.strip()]
 
 
 def check_counterfactuals():
-    """Recalculate question accuracy, paired success and world-state leakage."""
+    """Recalculate accuracy, success on both members of a pair, and
+    unobserved-location leakage from the 64 saved cases. Check that the cases
+    match the frozen diagnostic and that the recomputed table matches the
+    supplied results; no model is run.
+    """
     frame = pd.read_csv(RESULTS / "counterfactual_predictions.csv")
     frame["options"] = frame.options.map(ast.literal_eval)
     frozen = {
@@ -95,7 +101,11 @@ def check_counterfactuals():
 
 
 def check_process_counts():
-    """Check state revisions separately from changes to the final answer."""
+    """Recount review decisions and changes to states, evidence and answers from
+    the saved RecToM and OpenToM records. Compare the totals with the cognitive
+    process summary, keeping a state revision distinct from an improvement in
+    correctness.
+    """
     expected = json.loads(
         (RESULTS / "monitoring_control_process_summary.json").read_text()
     )
@@ -183,7 +193,10 @@ def check_process_counts():
 
 
 def check_representation_tables():
-    """Check split membership and final-layer values, without refitting probes."""
+    """Check dialogue separation and agreement between the layer-wise tables and
+    their final-layer summaries. This verifies saved-table consistency only; it
+    does not refit probes or recompute RSA from hidden-state arrays.
+    """
     index = pd.read_csv(RESULTS / "probe_dataset_index.csv")
     assert index.groupby("split").size().to_dict() == {
         "train": 2235,
@@ -191,6 +204,8 @@ def check_representation_tables():
         "test": 621,
     }
     assert index.groupby("dialogue_id").split.nunique().max() == 1
+    # Compare supplied summaries with other supplied tables. Recomputing
+    # representations, fitting probes and rebuilding RSA require the external arrays.
     probes = pd.read_csv(RESULTS / "layerwise_linear_probe_results.csv")
     final = probes[probes.layer == 32].set_index(["field", "system"])
     for row in pd.read_csv(

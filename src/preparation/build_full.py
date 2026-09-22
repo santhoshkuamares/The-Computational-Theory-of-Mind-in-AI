@@ -1,4 +1,11 @@
-"""Revision-4 data preparation: build full."""
+"""Build the revision-4 supervision used in the final training experiment.
+
+Fixed source annotations become state-building and field-review targets;
+answer-only repetitions match their question exposure. Conflicting records are
+quarantined in both arms, while validation/test inputs and references are
+exported separately. These are assistant-reviewed annotations, not
+independently validated human cognitive labels.
+"""
 
 import argparse, copy, hashlib, json, re
 from collections import Counter
@@ -122,7 +129,11 @@ CLAIMS = {
 
 
 def annotations(root):
-    """Load the fixed source-inspected annotation decisions."""
+    """Read the fixed dialogue/movie annotation file and expand compact claim
+    codes into values, evidence turns, bases and reasons. Reject duplicate
+    keys, fields or citations, keeping audit notes separate from the claims
+    used to construct training targets.
+    """
     path = root / "reviews" / "annotations.txt"
     result = {}
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -151,7 +162,11 @@ def annotations(root):
 
 
 def unknown(field):
-    """Represent an unsupported field using the explicit unknown state."""
+    """Build the explicit unknown record for a field not established by the
+    supplied dialogue prefix. Its empty citations and not_established basis
+    teach the system to represent missing evidence instead of inventing a known
+    value.
+    """
     return {
         "value": "unknown",
         "evidence_turns": [],
@@ -163,7 +178,12 @@ def unknown(field):
 
 
 def source_state(row, item):
-    """Compile annotated perspective claims with their source-turn references."""
+    """Compile the recorded annotations into the task state using only the
+    available dialogue prefix. Reject future or other-speaker-only evidence,
+    infer a proposer from the first exact title mention when needed, and apply
+    the stated willingness rules for desire questions without consulting the
+    answer label.
+    """
     lines = row["utterance_context"].splitlines()
     claims = copy.deepcopy(item["claims"])
     for field, c in claims.items():
@@ -210,6 +230,8 @@ def source_state(row, item):
         return slots
     if "intends_to_watch" in claims:
         return {"intends_to_watch": claims["intends_to_watch"]}
+    # The desire target here is a qualified willingness inference from the
+    # recorded recommendation response, not an observed future watching action.
     if "recommendation_response" in claims:
         c = claims["recommendation_response"]
         positive = c["value"] == "accepted"
@@ -244,7 +266,11 @@ def source_state(row, item):
 
 
 def check_state(row, slots):
-    """Check allowed state values and the structural evidence contract."""
+    """Validate field names, allowed values, evidence bases and turn bounds in an
+    annotated state. Return exact source quotations for its cited turns; these
+    structural checks do not independently prove that each quotation supports
+    the claim.
+    """
     if set(slots) != set(DOMAINS[row["task"]]):
         raise ValueError("Incorrect state fields")
     lines = row["utterance_context"].splitlines()
@@ -268,7 +294,13 @@ def check_state(row, slots):
 
 
 def target_for(row, slots):
-    """Construct the recorded structured completion target for one question."""
+    """Combine the annotated state, evidence and official answer into a structured
+    supervision target. Compare state values with the answer semantics to
+    record unsupported or conflicting claims, allowing conflicts to be
+    quarantined before export.
+    """
+    # The source state has already been built independently. Gold-option
+    # semantics are used here to record conflicts and unsupported answer claims.
     state = benchmark_state(row)
     conflicts = [
         name
@@ -295,12 +327,11 @@ def target_for(row, slots):
 
 
 def misleading_citation(row, target, field):
-    """Select a legal distractor under the unchanged reviewed unknown state.
-
-    Prefer a turn already used as evidence for a DIFFERENT state field.
-    Otherwise use a title-bearing turn, then any prefix turn. No gold access.
-    The non-entailment judgment comes from the reviewed whole-prefix unknown
-    annotation, not from citation bounds or the selection heuristic."""
+    """Choose a real prefix turn to accompany a synthetic unsupported value for a
+    field annotated as unknown. Prefer another field evidence, then a title
+    mention, then any prefix turn; the non-support judgment comes from the
+    recorded annotation, not this selection heuristic.
+    """
     claim = target["state"][field]
     if claim["value"] != "unknown" or claim["evidence_turns"]:
         raise ValueError("Distractor construction requires a reviewed unknown")
@@ -336,7 +367,11 @@ def misleading_citation(row, target, field):
 
 
 def examples(row, target):
-    """Expand a training question into the recorded answer, state and review examples."""
+    """Expand one eligible question into a state-building example and field-review
+    examples with masked, wrong, preserved or unsupported claims. Each review
+    target returns the recorded annotated claim, including unknown, so
+    supervision covers correction, preservation and citation recovery.
+    """
     if target["answer_claims_conflicting"]:
         raise ValueError("Conflict must be quarantined")
     target = copy.deepcopy(target)
@@ -349,6 +384,8 @@ def examples(row, target):
             json.dumps(target, ensure_ascii=False),
         )
     ]
+    # Construct several preliminary states for the same reviewed field.
+    # All review completions return its fixed annotated value and supporting turns.
     for field, correct in target["state"].items():
         cases = (
             ["retain_unknown"]
@@ -430,6 +467,11 @@ def examples(row, target):
 
 
 def run(root=ROOT, output=None):
+    """Build the complete revision-4 dataset from fixed sources and annotations,
+    quarantining conflicts equally across both training conditions. Export
+    structured supervision, exposure-matched answer-only examples, separate
+    held-out inputs and references, and a manifest with checksums.
+    """
     output = output or root / "data"
     rows, splits = load_sources(root)
     train = [r for r in rows if str(r["dialogue_id"]) in splits["train"]]
@@ -498,6 +540,8 @@ def run(root=ROOT, output=None):
         state_only.append(ex[0])
         factual.extend(ex)
         plain.append(answer_example(row))
+        # Repeat the answer-only question once per structured-condition example.
+        # This matches question exposure, not target-token count or training cost.
         matched.extend(
             (answer_example(row, "/repeat_" + str(i)) for i in range(1 + len(ex)))
         )
@@ -513,6 +557,8 @@ def run(root=ROOT, output=None):
     }
     for name, items in exports.items():
         write_jsonl(output / "sft" / f"{name}.jsonl", items)
+    # Keep held-out public inputs and reference answers in separate files.
+    # The supervised training exports above contain eligible training dialogues only.
     for split in ("validation", "test"):
         rr = [r for r in rows if str(r["dialogue_id"]) in splits[split]]
         write_jsonl(

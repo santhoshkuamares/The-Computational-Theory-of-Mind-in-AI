@@ -13,7 +13,10 @@ TRAIN_FILES = {
 
 
 def sha(path):
-    """Calculate a file checksum so that a changed input is detected before reuse."""
+    """Return a file checksum by reading the file in one-megabyte chunks. Chunked
+    reading also works for large checkpoints without loading the whole file
+    into memory.
+    """
     h = hashlib.sha256()
     with Path(path).open("rb") as f:
         for b in iter(lambda: f.read(1048576), b""):
@@ -22,25 +25,35 @@ def sha(path):
 
 
 def identity(value):
-    """Hash a canonical JSON record to identify a model, dataset or run."""
+    """Convert a Python value to JSON with a fixed key order and hash that text.
+    Equivalent settings therefore receive the same identifier, which is used to
+    check whether a saved run can be reused.
+    """
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
 
 
 def read_json(path):
-    """Read one JSON object from disk."""
+    """Load one UTF-8 JSON file into a Python value. Training uses this helper to
+    read settings, manifests and progress consistently.
+    """
     return json.loads(Path(path).read_text(encoding="utf8"))
 
 
 def read_jsonl(path):
-    """Read one JSON record per non-empty line, preserving file order."""
+    """Load each non-empty line as a separate JSON record. The original order is
+    retained so training schedules and saved predictions remain traceable.
+    """
     with Path(path).open(encoding="utf8") as f:
         return [json.loads(line) for line in f if line.strip()]
 
 
 def write_json(path, value):
-    """Write a JSON result using the original serialization convention."""
+    """Write readable JSON to a temporary file and then replace the destination.
+    This avoids leaving a partly written settings or progress file if a write
+    is interrupted.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
@@ -52,6 +65,11 @@ def write_json(path, value):
 
 
 def safe_extract(archive, destination, overwrite=False):
+    """Check ZIP members for damaged content, duplicate names, unsafe paths and
+    conflicting existing files before extracting them. This restores experiment
+    inputs without silently replacing different local data unless overwrite is
+    explicitly requested.
+    """
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(archive) as z:
@@ -89,7 +107,10 @@ def safe_extract(archive, destination, overwrite=False):
 
 
 def load_config(root):
-    """Load the frozen model and training settings and check their required fields."""
+    """Read settings.json and verify the pinned model, NF4 QLoRA method and basic
+    training limits. Return the settings only when they match the assumptions
+    used by this implementation.
+    """
     c = read_json(Path(root) / "settings.json")
     if c["model_id"] != MODEL_ID or c["model_revision"] != MODEL_REVISION:
         raise ValueError("Model identity changed")
@@ -107,7 +128,11 @@ def load_config(root):
 
 
 def load_train(root, condition):
-    """Load the requested training condition and verify hashes, split and example coverage."""
+    """Load one allowed training condition and verify its checksum, 30,266
+    examples, unique IDs and training-only dialogue membership. Checking
+    message roles and non-empty text prevents malformed or held-out records
+    from entering the training loop.
+    """
     if condition not in TRAIN_FILES:
         raise ValueError("Select one allowlisted training condition")
     data = Path(root) / "preparation/data"
@@ -142,7 +167,11 @@ def load_train(root, condition):
 
 
 def epoch_groups(n, batch_size, seed, epoch):
-    """No dropping, padding or duplicating rows. Fixed two-rank schedule."""
+    """Shuffle example indices with seed plus epoch, then divide them into logical
+    batches without dropping the final group. Even sizes support the original
+    two-GPU partition while ensuring every scheduled example is used exactly
+    once per epoch.
+    """
     if n % 2 or batch_size % 2 or batch_size < 2:
         raise ValueError(
             "Two-rank exact exposure requires an even row count and batch size"
@@ -153,6 +182,10 @@ def epoch_groups(n, batch_size, seed, epoch):
 
 
 def package_outputs(root):
+    """Collect run files, logs, reports, source and settings into a recovery ZIP
+    and return its path. A manifest stores file checksums, while temporary
+    files and caches are omitted so the archive contains completed artifacts.
+    """
     root = Path(root)
     target = root.parent / "subjectesis_qwen35_4b_outputs.zip"
     files = []
@@ -193,7 +226,10 @@ def package_outputs(root):
 
 
 def restore_runs(archive, root):
-    """Accept only this edition's own exported checkpoint archives; no executable restore."""
+    """Verify archive checksums and matching settings, then restore only files
+    under runs/. Reject path escapes and conflicting local files so recovery
+    cannot silently mix different experiments or replace executable source.
+    """
     root = Path(root)
     with zipfile.ZipFile(archive) as z:
         manifest = json.loads(z.read("recovery_manifest.json"))

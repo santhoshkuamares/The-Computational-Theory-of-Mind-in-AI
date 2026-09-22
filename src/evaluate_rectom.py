@@ -1,5 +1,10 @@
-"""Frozen final RecToM evaluation on 621 questions. The controller is in sections 4 and 5.
-Execute as a script in the recorded Colab environment. The model and adapters are frozen.
+"""Run the frozen five-condition RecToM test on 621 questions.
+
+The script verifies the development protocol and selected adapters, saves
+direct predictions, then runs initial-state construction and bounded field
+review. Reference answers are attached after predictions are frozen. Colab
+paths and the original completion guards are retained; inspect the functions
+below to follow the controller and scoring stages.
 """
 
 from project_setup import mount_drive, prepare_project
@@ -34,6 +39,10 @@ else:
 
 
 def canonical_hash(obj):
+    """Serialize protocol settings with sorted keys and compact separators, then
+    return their checksum. The evaluator uses this stable identity to verify
+    the exact development protocol before sealed-test inference.
+    """
     return hashlib.sha256(
         json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
@@ -52,6 +61,10 @@ print("Frozen development protocol verified:", EXPECTED_PROTOCOL_HASH)
 
 
 def critical_archive_check(path, condition):
+    """Verify completion metadata and the best adapter configuration and weights
+    against the recovery manifest. Require the recorded training exposure and
+    absence of test scoring, then return the checkpoint-selection metadata.
+    """
     with zipfile.ZipFile(path) as z:
         names = set(z.namelist())
         if "recovery_manifest.json" not in names:
@@ -120,6 +133,9 @@ if not TEST_INPUTS.exists() or not TEST_REFERENCES.exists():
 
 
 def read_jsonl_local(path):
+    """Read non-empty JSONL lines in file order. The evaluator uses this for
+    frozen test inputs and saved records without rewriting their content.
+    """
     with Path(path).open("r", encoding="utf8") as f:
         return [json.loads(line) for line in f if line.strip()]
 
@@ -140,6 +156,10 @@ ROOT = Path("/content/subjectesis_final_test_v1")
 
 
 def run(cmd, env=None):
+    """Print and execute a setup command, using the supplied environment when
+    provided. Stop on a nonzero exit code so later evaluation stages cannot
+    silently continue after failed preparation.
+    """
     cmd = [str(x) for x in cmd]
     print("\n>>>", " ".join(cmd), flush=True)
     subprocess.run(cmd, check=True, env=env)
@@ -188,6 +208,10 @@ ADAPTER_ROOT.mkdir(exist_ok=True)
 
 
 def extract_best_adapter(archive, condition, destination):
+    """Extract the selected condition best-adapter files into a fresh local
+    directory. Require both configuration and weights and reject
+    parent-directory paths so inference uses the intended saved checkpoint.
+    """
     destination = Path(destination)
     if destination.exists():
         shutil.rmtree(destination)
@@ -267,6 +291,10 @@ if any((len(v) != 1 for v in letter_ids.values())):
 
 
 def chat_ids(user_prompt):
+    """Apply the Qwen chat template with thinking disabled and return token IDs
+    for one user prompt. Reject overlength inputs instead of truncating
+    dialogue evidence before answer selection.
+    """
     text = tok.apply_chat_template(
         [{"role": "user", "content": user_prompt}],
         tokenize=False,
@@ -280,6 +308,10 @@ def chat_ids(user_prompt):
 
 
 def score_one_prompt(prompt, allowed):
+    """Compute next-token vocabulary logits and choose the highest-scoring allowed
+    option letter. This gives a constrained forced-choice answer without
+    sampling text or consulting the reference label.
+    """
     ids = torch.tensor([chat_ids(prompt)], device="cuda")
     with torch.autocast("cuda", dtype=torch.float16):
         logits = wrapper.next_logits(ids)[0]
@@ -288,12 +320,20 @@ def score_one_prompt(prompt, allowed):
 
 
 def load_adapter(adapter_dir):
+    """Load one saved LoRA checkpoint into the default adapter and set evaluation
+    mode. Reusing the same base network lets the direct conditions differ in
+    adapter weights while retaining the model-loading setup.
+    """
     state = load_file(Path(adapter_dir) / "adapter_model.safetensors")
     set_peft_model_state_dict(network, state, adapter_name="default")
     network.eval()
 
 
 def prediction_meta(system):
+    """Describe the system, frozen protocol, test-input hash, model revision and
+    selected checkpoints for a prediction file. This metadata is checked before
+    partial predictions are reused.
+    """
     return {
         "system": system,
         "protocol_hash": EXPECTED_PROTOCOL_HASH,
@@ -307,6 +347,10 @@ def prediction_meta(system):
 
 
 def direct_paths(system):
+    """Return the prediction and metadata paths for one direct system. Keeping the
+    pair together makes saved-answer reuse conditional on the matching
+    experiment description.
+    """
     return (
         FINAL_DIR / f"{system}_predictions.jsonl",
         FINAL_DIR / f"{system}_predictions.meta.json",
@@ -314,6 +358,10 @@ def direct_paths(system):
 
 
 def load_existing_direct(system):
+    """Load a partial direct prediction file only when its metadata exactly
+    matches the current frozen run. Reject duplicate record IDs and return an
+    ID-indexed dictionary so completed questions can be skipped.
+    """
     path, meta_path = direct_paths(system)
     if not path.exists():
         return {}
@@ -333,6 +381,10 @@ def load_existing_direct(system):
 
 
 def save_direct(system, done):
+    """Write completed direct predictions in test-input order and save their
+    metadata through temporary files. Regular saves let interrupted inference
+    resume without repeating completed questions.
+    """
     path, meta_path = direct_paths(system)
     tmp = path.with_suffix(".tmp")
     with tmp.open("w", encoding="utf8") as f:
@@ -347,6 +399,11 @@ def save_direct(system, done):
 
 
 def run_direct(system, adapter_dir=None, disable_adapter=False):
+    """Generate missing direct answers using the selected adapter or
+    disabled-adapter base model and periodically save progress. Require
+    complete coverage of 621 questions before returning the frozen predictions,
+    without reading answer labels for generation.
+    """
     if adapter_dir is not None:
         load_adapter(adapter_dir)
     done = load_existing_direct(system)
@@ -402,6 +459,10 @@ PROTOCOL_CONFIG = json.loads(PROTOCOL_CONFIG)
 
 
 def canonical_hash(obj):
+    """Serialize protocol settings with sorted keys and compact separators, then
+    return their checksum. The evaluator uses this stable identity to verify
+    the exact development protocol before sealed-test inference.
+    """
     return hashlib.sha256(
         json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
@@ -427,7 +488,11 @@ REQUIRED_FIELDS = {
 
 
 def extract_first_json_object(text):
-    """Parse the first complete JSON object while respecting quoted braces."""
+    """Locate the first complete brace-delimited object while tracking quoted
+    strings and escaped characters. Decode it as JSON or return None, so
+    surrounding prose can be tolerated without repairing malformed model
+    content.
+    """
     start = text.find("{")
     if start < 0:
         return None
@@ -460,7 +525,11 @@ def extract_first_json_object(text):
 
 
 def validate_initial(obj, task, allowed_letters):
-    """Check the initial state schema and allowed values, not semantic truth."""
+    """Check required top-level keys, task fields, allowed values and basic types
+    in an initial generated state. Return a validity flag and reason; passing
+    this schema check does not establish that the belief or its evidence is
+    true.
+    """
     if not isinstance(obj, dict):
         return (False, "not_object")
     required_top = {
@@ -495,7 +564,11 @@ def validate_initial(obj, task, allowed_letters):
 
 
 def validate_review(obj, field):
-    """Check the review schema and selected field, not whether the evidence entails the claim."""
+    """Check that a generated review addresses the selected field and has an
+    allowed decision, updated claim and evidence list. Return a validity flag
+    and reason so malformed updates can be recorded while retaining the
+    previous state.
+    """
     if not isinstance(obj, dict):
         return (False, "not_object")
     required = {"field", "decision", "updated_claim", "evidence", "stop_reason"}
@@ -522,12 +595,19 @@ def validate_review(obj, field):
 
 
 def current_state_for_review(state, task):
-    """Copy the fields relevant to the question task into the review prompt."""
+    """Deep-copy only the fields required by the current question task. Review and
+    finalizer prompts use this task-specific view without sharing mutable state
+    objects or adding reference answers.
+    """
     return {k: copy.deepcopy(state[k]) for k in REQUIRED_FIELDS[task] if k in state}
 
 
 def make_review_prompt(row, state, field):
-    """Render the frozen dialogue, current state and selected field-review instruction."""
+    """Combine the original question, current task state and instruction for one
+    selected field. The same frozen wording is used throughout the review
+    sequence, making each update traceable to the supplied dialogue and prior
+    state.
+    """
     return (
         row["prompt"]
         + "\nCurrent perspective state (may contain mistakes): "
@@ -540,7 +620,11 @@ def make_review_prompt(row, state, field):
 
 
 def finalizer_prediction(row, state):
-    """Use the same constrained answer rule on the state before and after review."""
+    """Build a prompt containing the question and the current state, then select
+    an allowed answer letter from model logits. Applying the same rule before
+    and after review isolates the effect of the updated state on the final
+    answer.
+    """
     prompt = (
         row["prompt"]
         + "\nPerspective state: "
@@ -552,10 +636,18 @@ def finalizer_prediction(row, state):
 
 
 def normalize_ws(x):
+    """Collapse whitespace in a value after converting it to text. Citation checks
+    use this to ignore formatting differences between a generated quotation and
+    its source turn.
+    """
     return " ".join(str(x).split())
 
 
 def dialogue_turns(row):
+    """Extract numbered dialogue lines from the common prompt into a turn-number
+    lookup. Evidence checks use this lookup to match a generated citation with
+    the actual supplied turn.
+    """
     block = row["prompt"].split("Dialogue:\n", 1)[1].split("\nQuestion:", 1)[0]
     turns = {}
     for line in block.splitlines():
@@ -567,7 +659,11 @@ def dialogue_turns(row):
 
 # Text binding is a structural audit; it does not decide semantic support.
 def evidence_binding_audit(evidence, turns):
-    """Audit citation-to-turn string binding after generation; this does not establish entailment."""
+    """Count citations whose turn exists and whose normalized quote equals or
+    contains that source-turn text. This records textual source binding after
+    generation; despite the historical all_exact key, it allows containing text
+    and does not test semantic entailment.
+    """
     if not isinstance(evidence, list):
         return {"items": 0, "valid_items": 0, "all_exact": False}
     valid = 0
@@ -584,6 +680,8 @@ def evidence_binding_audit(evidence, turns):
             continue
         q = normalize_ws(quote)
         source = normalize_ws(turns[turn])
+        # The recorded rule accepts a quote containing the full source turn.
+        # This checks textual binding only, not whether the turn supports the claim.
         if q == source or q.endswith(source) or source in q:
             valid += 1
     return {
@@ -594,7 +692,10 @@ def evidence_binding_audit(evidence, turns):
 
 
 def state_contract_audit(state, task, turns):
-    """Audit unknown and known claim contracts after inference without changing predictions."""
+    """Check each field against the known/unknown evidence rules and legal turn
+    numbers. Return per-field flags without altering predictions, keeping
+    structural consistency separate from semantic correctness.
+    """
     results = {}
     for field in REQUIRED_FIELDS[task]:
         claim = state.get(field, {})
@@ -637,6 +738,11 @@ test_order = [r["record_id"] for r in test_rows]
 
 
 def structured_meta():
+    """Record the identity of the paired no-review/review evaluation, including
+    protocol, model, input hash and selected adapter. The saved metadata
+    prevents partial structured traces from being mixed across incompatible
+    runs.
+    """
     return {
         "system_pair": ["subjectesis_no_review", "subjectesis_review"],
         "protocol_hash": PROTOCOL_HASH,
@@ -650,6 +756,10 @@ def structured_meta():
 
 
 def _chat_input_ids(user_prompt):
+    """Apply the frozen chat template and encode one prompt with thinking
+    disabled. Enforce the input-length limit so batching never silently removes
+    dialogue or review context.
+    """
     text = tok.apply_chat_template(
         [{"role": "user", "content": user_prompt}],
         tokenize=False,
@@ -665,6 +775,10 @@ def _chat_input_ids(user_prompt):
 
 
 def _generate_batch_once(prompts, max_new_tokens):
+    """Left-pad independent prompts, mask the padding and run one greedy
+    generation batch. Return only newly generated text in prompt order, keeping
+    each example context separate while sharing GPU work.
+    """
     encoded = [_chat_input_ids(p) for p in prompts]
     pad_id = tok.pad_token_id
     if pad_id is None:
@@ -698,6 +812,10 @@ def _generate_batch_once(prompts, max_new_tokens):
 def batched_generate_text(
     prompts, max_new_tokens, preferred=PREFERRED_GENERATION_BATCH
 ):
+    """Generate responses in batches and halve a batch after an out-of-memory
+    error until it fits. Preserve prompt order and decoding settings, and raise
+    the error if even one example cannot fit.
+    """
     if not prompts:
         return []
     outputs = [None] * len(prompts)
@@ -725,6 +843,10 @@ def batched_generate_text(
 
 
 def load_structured_progress():
+    """Read saved structured traces after checking their metadata, test membership
+    and unique IDs. Return completed cases by ID so the frozen controller can
+    resume only the remaining questions.
+    """
     if not STRUCTURED_PATH.exists():
         return {}
     if not STRUCTURED_META.exists():
@@ -746,6 +868,10 @@ def load_structured_progress():
 
 
 def save_structured_progress(done):
+    """Save completed structured traces in test order together with the expected
+    run metadata. Temporary-file replacement reduces the chance of leaving a
+    partial record file during an interruption.
+    """
     tmp = STRUCTURED_PATH.with_suffix(".tmp")
     with tmp.open("w", encoding="utf8") as f:
         for rid in test_order:
@@ -760,7 +886,12 @@ def save_structured_progress(done):
 # Construct one initial state, then run the fixed field-review plan on that state.
 # The no-review and review conditions share the initial state and answer rule.
 def process_chunk(rows):
-    """Run the recorded bounded field-review schedule on independent examples."""
+    """Construct an initial state for each test question, finalize its no-review
+    answer, and execute the bounded field-review plan. Valid updates modify
+    only the selected field; the reviewed proposer chooses later belief fields,
+    and both final answers and complete traces are returned without gold-label
+    access.
+    """
     raw_initials = batched_generate_text(
         [row["subjectesis_prompt"] for row in rows],
         PROTOCOL_CONFIG["initial_max_new_tokens"],
@@ -784,6 +915,8 @@ def process_chunk(rows):
             "state_after": None,
             "reviews": [],
         }
+        # Keep the invalid case in the result set with missing predictions.
+        # Do not repair its state using a reference answer.
         if not valid_initial:
             work.append(
                 {"row": row, "result": result, "state": None, "plan": [], "index": 0}
@@ -819,9 +952,13 @@ def process_chunk(rows):
                 "raw": raw,
                 "parsed": obj if valid else None,
             }
+            # Apply every schema-valid updated claim, even when the decision is
+            # preserve, because evidence or rationale can change without changing its value.
             if valid:
                 w["state"][field] = copy.deepcopy(obj["updated_claim"])
             w["result"]["reviews"].append(rr)
+            # Choose later fields from the reviewed proposer. A recommender
+            # requires response review; a seeker requires appraisal; unknown requires both.
             if w["row"]["task"] == "belief" and field == "proposer":
                 prop = w["state"].get("proposer", {}).get("value")
                 if prop == "recommender":
@@ -924,6 +1061,8 @@ with TEST_REFERENCES.open("r", encoding="utf8") as f:
     test_reference_rows = [json.loads(line) for line in f if line.strip()]
 if len(test_reference_rows) != 621:
     raise RuntimeError("Expected 621 sealed references.")
+# Only now attach gold answers, after the saved prediction freeze.
+# All metric and transition calculations below operate on those fixed answers.
 test_refs = {r["record_id"]: r for r in test_reference_rows}
 if set(test_refs) != {r["record_id"] for r in test_rows}:
     raise RuntimeError("Test input/reference record coverage mismatch.")
@@ -932,6 +1071,10 @@ print("Now computing final metrics. No protocol/model changes are permitted.")
 
 
 def score_direct(predictions):
+    """Attach reference labels and correctness flags to already-frozen direct
+    predictions by record ID. This scoring step runs after inference, keeping
+    the answer labels outside the prediction procedure.
+    """
     rows = []
     for p in predictions:
         ref = test_refs[p["record_id"]]["answer"]
@@ -945,6 +1088,10 @@ subjectesis_direct_scored = score_direct(subjectesis_direct)
 
 
 def score_structured(key, name):
+    """Read one answer stage from each saved structured trace and compare it with
+    the sealed reference. Return the same scored-row format as direct
+    evaluation, retaining invalid or missing answers as incorrect.
+    """
     rows = []
     for r in structured_results:
         ref = test_refs[r["record_id"]]["answer"]
@@ -975,15 +1122,28 @@ SYSTEM_ROWS = {
 
 
 def task_accuracy(rows, task):
+    """Return the fraction of correct predictions for one task family. Separating
+    belief and desire makes their unequal question counts visible before
+    calculating the equal-family mean.
+    """
     x = [r for r in rows if r["task"] == task]
     return sum((r["correct"] for r in x)) / len(x)
 
 
 def selection_score(rows):
+    """Average belief accuracy and desire accuracy with equal weight. The
+    historical name refers to validation checkpoint selection; on the final
+    test it is only a reported task-mean score.
+    """
     return (task_accuracy(rows, "belief") + task_accuracy(rows, "desire")) / 2
 
 
 def macro_f1(rows, task):
+    """Compute F1 for each label appearing in the references or predictions of the
+    selected task, then average those values. This preserves the original
+    evaluator convention; the later CPU analysis explicitly fixes the
+    target-class set.
+    """
     x = [r for r in rows if r["task"] == task]
     labels = sorted(
         set((r["reference"] for r in x)) | set((r["prediction"] for r in x)),
@@ -1003,6 +1163,10 @@ def macro_f1(rows, task):
 
 
 def summarize_system(name, rows):
+    """Return one named condition summary with task accuracies, their equal-weight
+    mean and task macro F1. These values feed the final comparison table after
+    all predictions have been frozen.
+    """
     return {
         "system": name,
         "belief_accuracy": task_accuracy(rows, "belief"),
@@ -1068,6 +1232,10 @@ source_binding = {
 
 
 def score_metric(sample, key, metric):
+    """Calculate belief accuracy, desire accuracy or their equal-weight mean from
+    a sampled correctness field. The bootstrap uses this shared metric
+    definition for both systems in every paired draw.
+    """
     if metric == "belief_accuracy":
         x = [r for r in sample if r["task"] == "belief"]
         return sum((r[key] for r in x)) / len(x)
@@ -1082,6 +1250,11 @@ def score_metric(sample, key, metric):
 
 
 def paired_bootstrap_diff(rows_a, rows_b, comparison, reps=5000, seed=42):
+    """Join two conditions by question ID and resample whole dialogues with
+    replacement using the same draw for both. Return observed task differences
+    and the original sorted-percentile intervals, so within-dialogue dependence
+    is retained.
+    """
     a = {r["record_id"]: r for r in rows_a}
     b = {r["record_id"]: r for r in rows_b}
     if set(a) != set(b):
@@ -1102,6 +1275,8 @@ def paired_bootstrap_diff(rows_a, rows_b, comparison, reps=5000, seed=42):
         by_dialogue[r["dialogue_id"]].append(r)
     dialogues = sorted(by_dialogue)
     result = {"comparison": comparison, "repetitions": reps, "seed": seed}
+    # Use the same seeded dialogue draws for both systems in each metric.
+    # This estimates sample uncertainty while keeping paired questions together.
     for metric in ["belief_accuracy", "desire_accuracy", "selection_score"]:
         rng = random.Random(seed)
         diffs = []
@@ -1155,6 +1330,10 @@ bootstrap_differences = [
 
 
 def system_bootstrap_ci(rows, reps=5000, seed=42):
+    """Resample complete dialogues for one condition and recalculate both task
+    accuracies and their mean. Return the original sorted-percentile interval
+    bounds for each metric rather than treating every question as independent.
+    """
     by_dialogue = defaultdict(list)
     for r in rows:
         by_dialogue[str(r["dialogue_id"])].append(r)

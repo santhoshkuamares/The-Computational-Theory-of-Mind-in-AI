@@ -20,6 +20,11 @@ TORCHAO_PIN = "torchao==0.16.0"
 
 
 def run(root):
+    """Prepare the recorded Python 3.12, Torch 2.10.0 and two-T4 environment,
+    retaining the host Torch and CUDA installation. Install pinned project
+    packages into a virtual environment, run an import compatibility check, and
+    save the actual package and hardware versions.
+    """
     root = Path(root)
     (root / "logs").mkdir(parents=True, exist_ok=True)
     import torch

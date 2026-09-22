@@ -12,12 +12,19 @@ class CompletionLoss(torch.nn.Module):
     """Compute causal loss only at supervised completion tokens, in small vocabulary-head chunks."""
 
     def __init__(self, network, chunk_size=32):
+        """Store the language model and the number of supervised positions
+        processed in each vocabulary-head chunk. Smaller chunks reduce peak
+        memory while the wrapper still sums loss across every supervised token.
+        """
         super().__init__()
         self.network = network
         self.chunk_size = chunk_size
 
     def core(self):
-        """Return the text backbone beneath the adapter wrapper."""
+        """Return the underlying language model, unwrapping the adapter container
+        when present. The loss code needs direct access to its transformer
+        backbone and output vocabulary head.
+        """
         return (
             self.network.get_base_model()
             if hasattr(self.network, "get_base_model")
@@ -25,7 +32,11 @@ class CompletionLoss(torch.nn.Module):
         )
 
     def forward(self, input_ids, labels):
-        """Sum next-token losses at the unmasked completion positions."""
+        """Compute the summed next-token loss only where labels are not masked
+        with -100. Run the backbone once, shift hidden states against their
+        target tokens, then apply the vocabulary head in checkpointed chunks to
+        reduce memory use.
+        """
         core = self.core()
         hidden = core.model(
             input_ids=input_ids,
@@ -33,6 +44,8 @@ class CompletionLoss(torch.nn.Module):
             use_cache=False,
             return_dict=True,
         ).last_hidden_state
+        # Position t predicts token t+1. Shift the labels and hidden states
+        # together, then exclude prompt and padding targets using the -100 mask.
         mask = labels[:, 1:] != -100
         selected = hidden[:, :-1, :][mask]
         targets = labels[:, 1:][mask]
@@ -41,6 +54,11 @@ class CompletionLoss(torch.nn.Module):
         losses = []
 
         def head_loss(h, y):
+            """Apply the vocabulary head to one group of hidden states and sum its
+            cross-entropy losses. Keeping this operation in a small function
+            allows PyTorch to recompute it during backpropagation instead of
+            storing the full vocabulary logits.
+            """
             return F.cross_entropy(core.lm_head(h).float(), y, reduction="sum")
 
         for offset in range(0, len(targets), self.chunk_size):
@@ -54,7 +72,10 @@ class CompletionLoss(torch.nn.Module):
 
     @torch.no_grad()
     def next_logits(self, input_ids):
-        """Return the last-position vocabulary scores for constrained answer selection."""
+        """Return vocabulary scores at the last input position without computing
+        gradients. Validation uses these scores to select an allowed answer
+        letter without generating a long response.
+        """
         core = self.core()
         hidden = core.model(
             input_ids=input_ids,
@@ -66,7 +87,10 @@ class CompletionLoss(torch.nn.Module):
 
 
 def trainable_parameters(network):
-    """Select only parameters that receive optimizer updates."""
+    """Return parameters whose requires_grad flag is true and reject an empty set.
+    Passing only these parameters to the optimizer limits updates to the
+    intended trainable adapter weights.
+    """
     params = [p for n, p in network.named_parameters() if p.requires_grad]
     if not params:
         raise ValueError("No trainable adapter parameters")
@@ -74,7 +98,9 @@ def trainable_parameters(network):
 
 
 def adapter_copy(network):
-    """Copy the trainable adapter parameters for the reversible smoke check."""
+    """Make independent CPU copies of all trainable parameters, indexed by name.
+    The smoke check uses this snapshot to undo its temporary trial update.
+    """
     return {
         n: p.detach().cpu().clone()
         for n, p in network.named_parameters()
@@ -83,7 +109,10 @@ def adapter_copy(network):
 
 
 def adapter_restore(network, values):
-    """Restore the adapter parameters and reject a mismatched parameter set."""
+    """Copy a saved parameter snapshot back into the trainable weights after
+    checking that the names match. Device and dtype conversion make the
+    restoration work even though the snapshot was stored on CPU.
+    """
     expected = {n for n, p in network.named_parameters() if p.requires_grad}
     if set(values) != expected:
         raise ValueError("Adapter parameter names differ")
@@ -94,7 +123,10 @@ def adapter_restore(network, values):
 
 
 def learning_rate(step, total, peak, warmup_fraction):
-    """Apply the recorded linear warmup followed by cosine decay."""
+    """Calculate the learning rate for one optimizer step using linear warmup
+    followed by cosine decay. The function uses the total planned steps so
+    interrupted sessions continue on the same schedule.
+    """
     warmup = max(1, int(total * warmup_fraction))
     if step < warmup:
         return peak * (step + 1) / warmup
@@ -105,7 +137,11 @@ def learning_rate(step, total, peak, warmup_fraction):
 def optimize_group(
     ddp, local_examples, optimizer, scaler, device, world_size, lr, max_grad_norm=1.0
 ):
-    """Exact global token-weighted mean, including a short final accumulation group."""
+    """Apply one optimizer update for a logical batch, normalizing by its total
+    supervised-token count across GPUs. Accumulate example losses, synchronize
+    gradients at the last example, clip finite gradients and retry bounded FP16
+    overflows before returning training metrics.
+    """
     # Validation switches to evaluation mode; restore training before the next update.
     ddp.train()
     wrapped = ddp.module if hasattr(ddp, "module") else ddp
@@ -151,6 +187,8 @@ def optimize_group(
                     enabled=device.type == "cuda",
                 ):
                     nll = ddp(ids, labels)
+                    # DDP averages gradients across processes. Multiplying by world_size
+                    # undoes that averaging so division uses the global target-token total.
                     loss = nll * (world_size / denominator.item())
                 if not torch.isfinite(nll):
                     raise FloatingPointError(
@@ -158,6 +196,8 @@ def optimize_group(
                     )
                 loss_total += float(nll.detach())
                 scaler.scale(loss).backward()
+        # Check and clip actual gradients after removing the FP16 loss scale.
+        # An overflow must not be committed as a normal optimizer update.
         scaler.unscale_(optimizer)
         finite = torch.tensor(
             int(

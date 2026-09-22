@@ -15,7 +15,10 @@ REPOSITORY = Path(__file__).resolve().parents[1]
 
 
 def mount_drive():
-    """Mount Google Drive when running in Colab; do nothing outside Colab."""
+    """Mount Google Drive at the standard Colab location when google.colab is
+    available. Outside Colab the helper returns immediately, allowing CPU
+    analysis to run locally.
+    """
     try:
         from google.colab import drive
     except ImportError:
@@ -24,7 +27,10 @@ def mount_drive():
 
 
 def extract_checked(archive, destination):
-    """Extract data safely and refuse to overwrite a different existing file."""
+    """Unpack a data archive into a specified directory after checking each
+    destination path. Existing identical files are reused, while different
+    contents raise an error to avoid mixing frozen inputs with another run.
+    """
     destination = Path(destination).resolve()
     with zipfile.ZipFile(archive) as bundle:
         for item in bundle.infolist():
@@ -47,16 +53,18 @@ def extract_checked(archive, destination):
 
 
 def ensure_analysis_inputs():
-    """Make the bundled frozen predictions and references available to CPU scripts."""
+    """Extract the bundled frozen predictions and references into the repository
+    layout expected by the CPU scripts. The checked extractor makes repeated
+    calls safe when the same inputs are already present.
+    """
     extract_checked(REPOSITORY / "data/frozen_analysis_inputs.zip", REPOSITORY)
 
 
 def prepare_project(root):
-    """Stage the source and revision-4 data under the original working paths.
-
-    The old notebooks called the training directory ``code``. Here it lives
-    under ``src/training`` for readers, then is copied to that original runtime
-    location. Existing source is retained only when identical to this checkout.
+    """Copy readable training and preparation modules into the working paths used
+    by the original notebooks, then unpack the preparation data. Return the
+    working root after creating log and report folders; conflicting source
+    files require a fresh directory.
     """
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
@@ -82,12 +90,10 @@ def prepare_project(root):
 
 
 def restore_training_source(archive, root, condition):
-    """Restore verified original code bytes and checkpoints for historical resume.
-
-    The original run identity hashes source bytes, including comments. The
-    readable formatting in this repository changes those hashes. A historical
-    resume therefore uses the source stored in its own recovery archive rather
-    than bypassing the identity check or rewriting the recorded identity.
+    """Restore checksum-verified historical source, settings and condition
+    checkpoints from a recovery archive. Source-byte hashes are part of the
+    original run identity, so resuming that run uses its archived code rather
+    than bypassing identity checks after documentation changes.
     """
     root = Path(root)
     with zipfile.ZipFile(archive) as bundle:

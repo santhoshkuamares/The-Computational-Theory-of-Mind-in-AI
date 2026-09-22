@@ -1,5 +1,9 @@
-"""Frozen-output CPU analysis: figures.
-Run from the repository root. No model inference or adapter training occurs."""
+"""Draw the benchmark, review, exposure and architecture figures.
+
+Run analyse.py first so results/ contains the required tables. This script
+reads those values and saves figures without changing their scores; the
+cognitive layer curves are produced separately by cognitive_analysis.py.
+"""
 
 from project_setup import ensure_analysis_inputs
 
@@ -48,6 +52,10 @@ plt.rcParams.update(
 
 
 def save(fig, name):
+    """Export a completed figure to PNG, PDF and SVG using the same layout and
+    then close it. The repository retains the selected PNGs, while local vector
+    exports support resizing or inclusion in the dissertation.
+    """
     for ext in ["png", "pdf", "svg"]:
         fig.savefig(
             OUT / (name + "." + ext), dpi=220, bbox_inches="tight", pad_inches=0.1
@@ -306,6 +314,10 @@ for x, y, w, h, txt in boxes:
 
 
 def arrow(a, b, label=None, pos=None):
+    """Draw a directed connection between two coordinates on the current
+    architecture axes. Optionally place a short label at a supplied position so
+    the diagram explains the flow between the implemented components.
+    """
     ax.add_patch(
         FancyArrowPatch(
             a, b, arrowstyle="-|>", mutation_scale=11, lw=1, color="#334f65"

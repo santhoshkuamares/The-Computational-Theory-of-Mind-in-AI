@@ -1,5 +1,11 @@
-"""Exploratory frozen-model probes, RSA, process counts and 64 counterfactual cases.
-Qwen and its adapters are frozen; the linear probe classifiers are fitted. Raw hidden-state arrays are external inputs for independent probe/RSA reproduction.
+"""Investigate frozen-model representations and perspective-sensitive behavior.
+
+This exploratory follow-up extracts hidden states for the same RecToM prompts,
+fits linear probes, measures representational similarity, counts saved review
+events and evaluates 64 controlled information-access cases. Qwen and its
+adapters stay frozen; only the small probe classifiers are fitted. The
+representation arrays saved during extraction are required to independently
+refit probes or recompute RSA.
 """
 
 from project_setup import mount_drive, prepare_project
@@ -40,11 +46,17 @@ SEED = 42
 
 
 def sha256_bytes(data):
-    """Calculate the checksum of an archive member before loading it."""
+    """Return a SHA-256 checksum for bytes read from an archive member. This binds
+    the analysis to the saved completion metadata and selected adapter weights.
+    """
     return hashlib.sha256(data).hexdigest()
 
 
 def verify_training_archive(path, condition):
+    """Verify the completion record and best-adapter files against the recovery
+    manifest. Require a completed 30,266-example schedule and return the
+    metadata identifying the checkpoint used for frozen-model analysis.
+    """
     with zipfile.ZipFile(path) as z:
         manifest = json.loads(z.read("recovery_manifest.json"))["files"]
         completed_name = f"runs/{condition}/completed.json"
@@ -109,7 +121,10 @@ from convert_v1 import input_text, benchmark_state
 
 
 def read_jsonl(path):
-    """Read one JSON record per non-empty line, preserving file order."""
+    """Load non-empty JSONL lines into records in their saved order. This supplies
+    the question data and previously recorded process traces used by the
+    cognitive analyses.
+    """
     with Path(path).open("r", encoding="utf8") as f:
         return [json.loads(line) for line in f if line.strip()]
 
@@ -129,9 +144,15 @@ test_refs = {
 
 # All model conditions receive this same prompt during representation extraction.
 def plain_prompt(row):
+    """Render the common RecToM question and request only an option letter. All
+    three model conditions receive this identical prompt during hidden-state
+    extraction, avoiding differences caused by condition-specific instructions.
+    """
     return input_text(row) + "\nReturn only the selected option letter."
 
 
+# Stage 1: build the question index using the original dialogue splits.
+# Targets are decoded benchmark variables; model prompts contain only the question.
 probe_rows = []
 for r in train_records:
     inp = copy.deepcopy(r["input"])
@@ -177,6 +198,8 @@ FIELDS = {
     "appraisal": ["likes", "dislikes"],
     "intends_to_watch": ["yes", "no"],
 }
+# Restrict this analysis to questions with one of the two encoded values
+# for the selected field. The eligible sample size can therefore differ by field.
 for field, classes in FIELDS.items():
     probe_df[field] = probe_df["state"].apply(lambda s: s.get(field))
     counts = probe_df.groupby("split")[field].value_counts(dropna=True)
@@ -278,6 +301,10 @@ wrapper.eval()
 
 
 def extract_best_adapter(archive, condition, destination):
+    """Extract the best-adapter directory for one condition into a fresh local
+    folder. The later analyses load these already selected weights without
+    fine-tuning the language model again.
+    """
     destination = Path(destination)
     if destination.exists():
         shutil.rmtree(destination)
@@ -301,6 +328,10 @@ extract_best_adapter(SUBJECTESIS_ZIP, "subjectesis", SUBJECTESIS_ADAPTER)
 
 
 def load_adapter(path):
+    """Replace the default adapter tensors with one saved checkpoint and set
+    evaluation mode. This switches trained conditions while keeping the
+    underlying model-loading setup fixed.
+    """
     state = load_file(Path(path) / "adapter_model.safetensors")
     set_peft_model_state_dict(network, state, adapter_name="default")
     network.eval()
@@ -315,6 +346,10 @@ REP_DIR.mkdir(exist_ok=True)
 
 
 def chat_ids(prompt):
+    """Apply the Qwen chat template with thinking disabled and return token IDs.
+    Reject prompts exceeding the recorded maximum length so representation
+    extraction never silently truncates the question context.
+    """
     text = tok.apply_chat_template(
         [{"role": "user", "content": prompt}],
         tokenize=False,
@@ -329,7 +364,11 @@ def chat_ids(prompt):
 
 # Select the last real prompt token rather than padding positions.
 def forward_hidden_batch(prompts):
-    """Extract the final real prompt-token hidden states for each layer."""
+    """Run a frozen forward pass and collect the last real prompt-token vector
+    from every returned hidden-state layer. Left padding places that token at
+    the final position for every example; return a CPU float16 array shaped
+    examples by layers by hidden dimensions.
+    """
     encoded = [chat_ids(p) for p in prompts]
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     max_len = max((len(x) for x in encoded))
@@ -350,6 +389,8 @@ def forward_hidden_batch(prompts):
             use_cache=False,
             return_dict=True,
         )
+    # Left padding makes -1 the final real prompt token in every row.
+    # Include the embedding output as layer 0 and the transformer outputs after it.
     hidden = torch.stack([h[:, -1, :] for h in out.hidden_states], dim=1)
     result = hidden.detach().to(dtype=torch.float16, device="cpu").numpy()
     del input_ids, attention_mask, out, hidden
@@ -359,7 +400,11 @@ def forward_hidden_batch(prompts):
 def extract_system_representations(
     system_name, adapter_path=None, disable_adapter=False
 ):
-    """Run frozen-model forward passes and save representation arrays for one condition."""
+    """Extract the hidden states for one model condition in batches and save them
+    in a memory-mapped NumPy array with metadata. Reduce batch size after
+    memory errors; existing local arrays are reused when the recorded row count
+    matches, so distinct analyses should use separate working directories.
+    """
     path = REP_DIR / f"{system_name}.npy"
     meta_path = REP_DIR / f"{system_name}.meta.json"
     if path.exists() and meta_path.exists():
@@ -432,6 +477,8 @@ def extract_system_representations(
     return np.load(path, mmap_mode="r")
 
 
+# Stage 2: compare the same prompt representations for base, answer-only
+# and Subjectesis. These are forward passes with no language-model training.
 BASE_H = extract_system_representations("base", disable_adapter=True)
 ANSWER_H = extract_system_representations("answer_only", adapter_path=ANSWER_ADAPTER)
 SUBJECTESIS_H = extract_system_representations(
@@ -453,10 +500,16 @@ final_layer_predictions = {}
 
 
 def encode_binary(series, classes):
+    """Map the two specified class names to zero and one in their declared order.
+    This supplies consistent numeric targets to logistic-regression probes
+    across layers and model conditions.
+    """
     mapping = {classes[0]: 0, classes[1]: 1}
     return np.array([mapping[x] for x in series], dtype=np.int64)
 
 
+# Restrict this analysis to questions with one of the two encoded values
+# for the selected field. The eligible sample size can therefore differ by field.
 for field, classes in FIELDS.items():
     field_rows = probe_df[probe_df[field].isin(classes)].copy()
     train_idx = field_rows.index[field_rows.split == "train"].to_numpy()
@@ -491,6 +544,8 @@ for field, classes in FIELDS.items():
                 if len(val_idx)
                 else None
             )
+            # Stage 3: fit a standardized linear classifier using training rows only.
+            # C is fixed at 1.0; validation scores are reported without a parameter search.
             probe = make_pipeline(
                 StandardScaler(),
                 LogisticRegression(
@@ -501,6 +556,8 @@ for field, classes in FIELDS.items():
                     random_state=SEED,
                 ),
             )
+            # Only the scaler and logistic-regression probe are fitted here.
+            # The extracted representations and language-model weights do not change.
             probe.fit(X_train, y_train)
             pred_test = probe.predict(X_test)
             row = {
@@ -556,10 +613,15 @@ for field in probe_results_df.field.unique():
     fig.tight_layout()
     fig.savefig(PLOT_DIR / f"probe_{field}_layer_curve.png", dpi=200)
     plt.show()
+# Resample test dialogues to estimate final-layer probe differences.
+# These intervals condition on the fitted probes and saved model checkpoints;
+# they do not measure variation over independent model-training seeds.
 BOOT_REPS = 5000
 rng = random.Random(SEED)
 bootstrap_rows = []
 test_dialogues = probe_df.loc[probe_df.split == "test", ["dialogue_id"]]
+# Restrict this analysis to questions with one of the two encoded values
+# for the selected field. The eligible sample size can therefore differ by field.
 for field, classes in FIELDS.items():
     key_subjectesis = (field, "subjectesis")
     key_answer = (field, "answer_only")
@@ -630,7 +692,11 @@ STATE_FIELDS = ["proposer", "seen", "recommendation_response", "appraisal"]
 
 # This target encodes benchmark variables, not independently measured human beliefs.
 def state_distance_matrix(frame):
-    """Build the benchmark-variable distance matrix used as the RSA target."""
+    """Build pairwise distances from the proportion of differing benchmark-state
+    fields that are present in both records. Store NaN when nothing is
+    comparable; RSA uses this label-derived geometry rather than independent
+    human or neural measurements.
+    """
     n = len(frame)
     D = np.zeros((n, n), dtype=np.float32)
     states = frame["state"].tolist()
@@ -648,6 +714,9 @@ def state_distance_matrix(frame):
     return D
 
 
+# Stage 4: compare pairwise cosine distances with benchmark-state
+# dissimilarities using Spearman rank correlation. Each pair is used once,
+# and the interpretation is representational alignment rather than brain mapping.
 THEORY_D = state_distance_matrix(belief_test)
 tri = np.triu_indices(len(belief_test), k=1)
 theory_vec = THEORY_D[tri]
@@ -682,6 +751,9 @@ ax.legend()
 fig.tight_layout()
 fig.savefig(PLOT_DIR / "rsa_belief_state_layer_curve.png", dpi=200)
 plt.show()
+# Remove one whole dialogue at a time for final-layer RSA uncertainty.
+# Question pairs overlap, so treating all pairwise distances as independent
+# observations would overstate the amount of evidence.
 jackknife_rows = []
 for system_name, hidden in SYSTEM_H.items():
     X_all = np.asarray(hidden[belief_indices, N_LAYERS - 1, :], dtype=np.float32)
@@ -729,6 +801,9 @@ print(rsa_jackknife_df.to_string(index=False))
 from collections import Counter
 
 # Count state edits separately from final-answer edits.
+# Stage 5: inspect saved review traces without new inference. A changed
+# claim, evidence list or uncertainty string describes process behavior,
+# not necessarily detection or correction of an actual reasoning error.
 process_summary = {}
 rectom_path = RECTOM_FINAL_DIR / "structured_results_scored.jsonl"
 if rectom_path.exists():
@@ -837,6 +912,9 @@ if opentom_structured_path.exists():
     json.dumps(process_summary, indent=2) + "\n"
 )
 print(json.dumps(process_summary, indent=2))
+# Stage 6: define 16 templates crossed with perspective order and access
+# to the move, giving 64 cases and 32 observed/unobserved pairs. These are
+# post hoc controlled diagnostics, not a new large held-out benchmark.
 SCENARIOS = [
     ("Maya", "Liam", "book", "drawer", "shelf"),
     ("Nora", "Ethan", "key", "box", "cabinet"),
@@ -857,6 +935,8 @@ SCENARIOS = [
 ]
 counterfactual_rows = []
 for i, (mover, observer, obj, initial, new) in enumerate(SCENARIOS):
+    # Alternate option order across scenarios so the original location
+    # is not always represented by the same answer letter.
     if i % 2 == 0:
         options = {"A": initial, "B": new}
         initial_letter, new_letter = ("A", "B")
@@ -916,6 +996,10 @@ if any((len(v) != 1 for v in letter_ids.values())):
 
 
 def direct_counterfactual_prompt(row):
+    """Format one controlled story, its perspective question and its two location
+    options. The direct conditions receive the same A/B prompt, without the
+    stored gold label or a structured-state instruction.
+    """
     return (
         "Story:\n"
         + row["story"]
@@ -928,7 +1012,10 @@ def direct_counterfactual_prompt(row):
 
 
 def score_letter(prompt):
-    """Choose among the allowed answer tokens using the frozen model logits."""
+    """Choose A or B by comparing their next-token logits under the frozen model.
+    This gives a constrained answer for direct and finalized counterfactual
+    prompts without sampling or using the gold label.
+    """
     ids = chat_ids(prompt)
     input_ids = torch.tensor([ids], dtype=torch.long, device="cuda")
     with torch.inference_mode(), torch.autocast("cuda", dtype=torch.float16):
@@ -939,6 +1026,10 @@ def score_letter(prompt):
 
 
 def numbered_story(text):
+    """Split story text into sentences using punctuation followed by whitespace
+    and add sentence numbers. Return the numbered text and count to provide
+    citation references in the structured diagnostic prompts.
+    """
     parts = [x.strip() for x in re.split("(?<=[.!?])\\s+", text.strip()) if x.strip()]
     return ("\n".join((f"{i + 1}: {s}" for i, s in enumerate(parts))), len(parts))
 
@@ -948,6 +1039,11 @@ REVIEW_INSTRUCTION = "Review the current perspective-specific belief record agai
 
 
 def state_prompt_counterfactual(row):
+    """Request a perspective-specific belief record using the numbered story,
+    question and options. The instruction explicitly describes the
+    information-access rule, so diagnostic performance reflects both the
+    trained model and this prompting support.
+    """
     story, _ = numbered_story(row["story"])
     return (
         "Numbered story:\n"
@@ -962,6 +1058,10 @@ def state_prompt_counterfactual(row):
 
 
 def review_prompt_counterfactual(row, state):
+    """Ask for one review of the current belief record against the numbered story.
+    The model may revise, preserve or retain unknown, with instructions to
+    respect information unavailable to the target belief holder.
+    """
     story, _ = numbered_story(row["story"])
     return (
         "Numbered story:\n"
@@ -976,6 +1076,10 @@ def review_prompt_counterfactual(row, state):
 
 
 def finalizer_prompt_counterfactual(row, state):
+    """Append the belief record to the original A/B question prompt and request a
+    final answer. Using the same finalizer before and after review makes the
+    change in record the intended difference between those two stages.
+    """
     return (
         direct_counterfactual_prompt(row)
         + "\n\nPerspective-specific belief record:\n"
@@ -985,6 +1089,10 @@ def finalizer_prompt_counterfactual(row, state):
 
 
 def apply_chat(prompt):
+    """Wrap one diagnostic prompt in the Qwen user-message template with thinking
+    disabled. Return the formatted text used by batched generation so
+    structured responses share the same chat convention.
+    """
     return tok.apply_chat_template(
         [{"role": "user", "content": prompt}],
         tokenize=False,
@@ -994,7 +1102,10 @@ def apply_chat(prompt):
 
 
 def generate_text_batch(prompts, max_new_tokens, preferred=None):
-    """Generate greedy completions with the saved prompt and batching settings."""
+    """Generate greedy structured completions from left-padded prompts and return
+    continuation text in input order. After an out-of-memory error, reduce the
+    batch size while retaining the same prompts and output-token budget.
+    """
     if not prompts:
         return []
     preferred = preferred or GENERATION_BATCH
@@ -1056,6 +1167,11 @@ def generate_text_batch(prompts, max_new_tokens, preferred=None):
 
 
 def first_json(text):
+    """Find the first balanced JSON object while tracking strings and escapes,
+    then decode it. Return None for missing or malformed objects so invalid
+    diagnostic responses are recorded rather than repaired using the expected
+    answer.
+    """
     start = text.find("{")
     if start < 0:
         return None
@@ -1087,6 +1203,11 @@ def first_json(text):
 
 
 def run_direct_system(name, adapter_path=None, disable_adapter=False):
+    """Select an adapter or disable adapters for the base condition, then score
+    every counterfactual prompt with the A/B rule. Return predictions in
+    dataframe order and restore the adapter context afterward; the name
+    argument labels the caller intent and does not affect scoring.
+    """
     if adapter_path is not None:
         load_adapter(adapter_path)
     ctx = network.disable_adapter() if disable_adapter else None
@@ -1107,6 +1228,9 @@ answer_pred = run_direct_system("answer_only", adapter_path=ANSWER_ADAPTER)
 subjectesis_pred = run_direct_system("subjectesis", adapter_path=SUBJECTESIS_ADAPTER)
 load_adapter(SUBJECTESIS_ADAPTER)
 rows = [r for _, r in counterfactual_df.iterrows()]
+# The structured diagnostic explicitly reminds the model about access
+# to the move. Interpret its comparison with direct prompting in light of
+# this instruction difference as well as the different adapter conditions.
 raw_initial = generate_text_batch([state_prompt_counterfactual(r) for r in rows], 220)
 states = []
 for row, raw in zip(rows, raw_initial):
@@ -1118,6 +1242,8 @@ for row, raw in zip(rows, raw_initial):
     )
     states.append(obj if valid else None)
 no_review_pred = []
+# Use the same initial record for the no-review and review branches.
+# Only the reviewed branch can receive the later belief-record update.
 for row, state in zip(rows, states):
     no_review_pred.append(
         score_letter(finalizer_prompt_counterfactual(row, state))
@@ -1133,6 +1259,8 @@ raw_reviews_valid = generate_text_batch(review_prompts, 180)
 raw_review_iter = iter(raw_reviews_valid)
 reviewed_states = []
 review_valid_flags = []
+# Use the same initial record for the no-review and review branches.
+# Only the reviewed branch can receive the later belief-record update.
 for row, state in zip(rows, states):
     if state is None:
         reviewed_states.append(None)
@@ -1208,6 +1336,9 @@ for system in SYSTEM_COLUMNS:
         leakage_rate = float(np.mean(leakage))
     else:
         leakage_rate = np.nan
+    # A pair succeeds only when both information-access conditions are right.
+    # The historical diagnostic excludes pairs with missing predictions; all
+    # saved predictions in this run were valid.
     pair_success = []
     for pair_id, group in counterfactual_out.groupby("pair_id"):
         if len(group) != 2 or group[system].isna().any():
@@ -1236,6 +1367,9 @@ ax.tick_params(axis="x", rotation=25)
 fig.tight_layout()
 fig.savefig(PLOT_DIR / "counterfactual_overall_accuracy.png", dpi=200)
 plt.show()
+# Save the exact analysis settings and interpretation limits alongside
+# the results. The study is exploratory because this follow-up was added
+# after the main benchmark outcomes were observed.
 analysis_manifest = {
     "analysis_type": "exploratory cognitive and representational analysis",
     "model_id": MODEL_ID,

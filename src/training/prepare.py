@@ -7,6 +7,11 @@ from collections import Counter
 
 
 def run(root):
+    """Rebuild revision-4 supervision and run the original preparation tests
+    before training. Compare the rebuilt file hashes and per-question exposure
+    counts with the frozen records, then save a report only if both training
+    conditions still match the intended data.
+    """
     root = Path(root)
     prep = root / "preparation"
     (root / "logs").mkdir(exist_ok=True)

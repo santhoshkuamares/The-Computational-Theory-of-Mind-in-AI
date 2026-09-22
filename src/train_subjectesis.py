@@ -18,11 +18,19 @@ from project_setup import prepare_project, restore_training_source, REPOSITORY
 
 
 def run(command, env=None):
-    """Run one pipeline stage and stop immediately if it fails."""
+    """Execute one pipeline command using the requested environment and stop if it
+    fails. Converting path objects to strings lets the same helper launch
+    preparation, dependency setup and training stages.
+    """
     subprocess.run([str(part) for part in command], check=True, env=env)
 
 
 def main():
+    """Read command-line options and prepare the Subjectesis working directory.
+    Run the recorded T4 workflow or restore a historical archive for A100
+    continuation, then launch training; preparation-only mode stops after
+    rebuilding and checking the data.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--mode", choices=["t4", "a100"], default="t4")

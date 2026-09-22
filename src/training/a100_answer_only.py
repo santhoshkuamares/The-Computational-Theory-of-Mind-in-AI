@@ -17,7 +17,10 @@ import train as original_train
 
 
 def single_gpu_distributed_info():
-    """Initialize the one-process A100 environment used by the continuation run."""
+    """Initialize a one-process NCCL group for the answer-only run. Require one
+    A100 and return the same rank/device interface as the original training
+    loop so its checkpoint and validation code can be reused.
+    """
     rank = int(os.environ.get("RANK", "0"))
     local = int(os.environ.get("LOCAL_RANK", "0"))
     world = int(os.environ.get("WORLD_SIZE", "1"))
@@ -52,7 +55,10 @@ original_train.distributed_info = single_gpu_distributed_info
 
 
 def make_batch(examples, device):
-    """Right-pad token sequences and mask padding labels out of the training loss."""
+    """Right-pad examples to the longest sequence in a microbatch and place the
+    tensors on the GPU. Padding labels remain -100, so padded positions do not
+    become supervised targets; the returned pair contains input IDs and labels.
+    """
     if not examples:
         raise ValueError("Empty microbatch")
     max_len = max((len(ex["input_ids"]) for ex in examples))
@@ -69,7 +75,10 @@ def make_batch(examples, device):
 
 
 def supervised_token_count(examples):
-    """Count completion targets after the causal one-token shift."""
+    """Count labels other than -100 after the causal one-token shift. This
+    denominator gives each supervised target equal weight even when examples
+    have different lengths or microbatch sizes.
+    """
     return sum((sum((int(v != -100) for v in ex["labels"][1:])) for ex in examples))
 
 
@@ -83,7 +92,12 @@ def optimize_group_a100(
     lr,
     max_grad_norm=1.0,
 ):
-    """Process the same logical batch with smaller microbatches only when memory requires it."""
+    """Apply one logical-batch update on the A100, accumulating losses divided by
+    the same total target-token count. Try smaller microbatches after
+    out-of-memory errors and bounded loss-scale retries for non-finite
+    gradients, restoring random states before each attempt and returning the
+    successful update metrics.
+    """
     actual_world = dist.get_world_size()
     if actual_world != 1:
         raise RuntimeError(f"A100 baseline requires world_size=1, got {actual_world}")
@@ -104,6 +118,8 @@ def optimize_group_a100(
             torch.set_rng_state(cpu_rng)
             torch.cuda.set_rng_state(cuda_rng, device)
             random.setstate(python_rng)
+            # Start this retry with clean gradients. Losses from a failed
+            # microbatch or overflow attempt must not carry into the next attempt.
             optimizer.zero_grad(set_to_none=True)
             loss_total = 0.0
             oom = False
@@ -124,6 +140,8 @@ def optimize_group_a100(
                             device_type="cuda", dtype=torch.float16, enabled=True
                         ):
                             nll = ddp(ids, labels)
+                            # Normalize every microbatch by the full logical-batch token count.
+                            # Adding these gradients reproduces that token-weighted objective.
                             loss = nll / denominator
                         if not torch.isfinite(nll):
                             raise FloatingPointError("Non-finite forward loss")
@@ -166,6 +184,8 @@ def optimize_group_a100(
                 raise FloatingPointError(
                     "Non-finite adapter gradients at minimum scale"
                 )
+            # Start this retry with clean gradients. Losses from a failed
+            # microbatch or overflow attempt must not carry into the next attempt.
             optimizer.zero_grad(set_to_none=True)
             scaler.update(new_scale=max(1.0, scaler.get_scale() / 2))
         if not oom:
@@ -175,6 +195,8 @@ def optimize_group_a100(
     raise RuntimeError("Even microbatch=1 exhausted A100 memory") from last_oom
 
 
+# Replace the imported optimizer helper with the recorded A100 version.
+# The training loop, validation selection and checkpoint code stay shared.
 engine.optimize_group = optimize_group_a100
 original_train.optimize_group = optimize_group_a100
 if __name__ == "__main__":

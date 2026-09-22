@@ -1,4 +1,9 @@
-"""Revision-4 data preparation: dataset io."""
+"""Load checked preparation exports and support the preparation mask tests.
+
+The loader restricts access to allowed training files. The encoding helper
+retains the earlier preparation-format template for its tests; the actual Qwen
+experiment uses src/training/tokenize_data.py for model tokenization.
+"""
 
 import json
 import hashlib
@@ -14,6 +19,11 @@ TRAIN_FILES = {
 
 
 def load_training(data_root, filename):
+    """Load an explicitly allowed supervision file after checking its checksum and
+    training-dialogue membership. Require one user prompt and a non-empty
+    assistant target, keeping evaluation references and review queues outside
+    this loader.
+    """
     root = Path(data_root)
     if filename not in TRAIN_FILES:
         raise ValueError(
@@ -42,6 +52,11 @@ def load_training(data_root, filename):
 
 
 def encode_training_example(row, tokenizer, max_tokens=4096):
+    """Encode the earlier preparation-format prompt and response, masking prompt
+    labels with -100 and rejecting truncation. This helper remains in the
+    preparation tests; the actual Qwen run uses training/tokenize_data.py and
+    the Qwen chat template.
+    """
     messages = row["messages"]
     if [m["role"] for m in messages] != ["user", "assistant"]:
         raise ValueError("Invalid role sequence")
@@ -74,6 +89,10 @@ def encode_training_example(row, tokenizer, max_tokens=4096):
 
 
 def pad_batch(examples, pad_token_id, length=None):
+    """Pad encoded examples to a common length and return input IDs, attention
+    masks and labels as lists. Padding receives attention zero and label -100,
+    so it neither represents real input nor contributes a supervised target.
+    """
     length = max((len(x["input_ids"]) for x in examples)) if length is None else length
     result = {"input_ids": [], "attention_mask": [], "labels": []}
     for example in examples:

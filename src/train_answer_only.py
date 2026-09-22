@@ -60,6 +60,10 @@ ROOT = Path("/content/answer_only_qwen35_4b_a100_v1")
 
 
 def run(cmd, env=None):
+    """Print and execute one setup command with the requested environment. Raise
+    on failure so training does not proceed with missing preparation files or
+    dependencies.
+    """
     cmd = [str(x) for x in cmd]
     print("\n>>>", " ".join(cmd), flush=True)
     subprocess.run(cmd, check=True, env=env)
@@ -155,6 +159,10 @@ WRAPPER = Path(__file__).resolve().parent / "training/a100_answer_only.py"
 
 
 def file_sha(path):
+    """Read a file in one-megabyte chunks and return its SHA-256 checksum.
+    Recovery packaging uses this to identify large checkpoint files without
+    loading them completely into memory.
+    """
     h = hashlib.sha256()
     with Path(path).open("rb") as f:
         for chunk in iter(lambda: f.read(1024 * 1024), b""):
@@ -165,6 +173,11 @@ def file_sha(path):
 def package_baseline(
     root, destination=Path("/content/answer_only_qwen35_4b_outputs.zip")
 ):
+    """Collect the ordinary-condition run, supporting source, settings, logs and
+    reports into a recovery ZIP. Deduplicate paths, exclude temporary files,
+    add a checksum manifest and check the finished archive before returning its
+    path.
+    """
     root = Path(root)
     destination = Path(destination)
     tmp = destination.with_suffix(".tmp")
@@ -225,6 +238,11 @@ def package_baseline(
 
 
 def backup_to_drive():
+    """Package the current answer-only run and replace the Drive recovery archive
+    through a temporary copy. Retry missing-file races up to three times
+    because checkpoint rotation may occur during packaging, and report other
+    backup failures without hiding them.
+    """
     for attempt in range(3):
         try:
             archive = package_baseline(ROOT)
@@ -252,6 +270,10 @@ stop_backup = threading.Event()
 
 
 def backup_loop():
+    """Wait on a stop event and back up the run every 30 minutes while training
+    continues. The event allows the background thread to stop promptly when the
+    training process finishes.
+    """
     while not stop_backup.wait(1800):
         backup_to_drive()
 
@@ -309,6 +331,10 @@ RUN = ROOT / "runs/ordinary"
 
 
 def read_json_local(path):
+    """Read one local JSON progress or result file. The final reporting stage uses
+    it to display the durable checkpoint, completion state and best validation
+    result.
+    """
     return json.loads(Path(path).read_text())
 
 
@@ -340,6 +366,10 @@ else:
 if "package_baseline" not in globals():
 
     def file_sha(path):
+        """Read a file in one-megabyte chunks and return its SHA-256 checksum.
+        Recovery packaging uses this to identify large checkpoint files without
+        loading them completely into memory.
+        """
         h = hashlib.sha256()
         with Path(path).open("rb") as f:
             for chunk in iter(lambda: f.read(1024 * 1024), b""):
@@ -349,6 +379,11 @@ if "package_baseline" not in globals():
     def package_baseline(
         root, destination=Path("/content/answer_only_qwen35_4b_outputs.zip")
     ):
+        """Collect the ordinary-condition run, supporting source, settings, logs
+        and reports into a recovery ZIP. Deduplicate paths, exclude temporary
+        files, add a checksum manifest and check the finished archive before
+        returning its path.
+        """
         root = Path(root)
         destination = Path(destination)
         tmp = destination.with_suffix(".tmp")

@@ -1,5 +1,10 @@
-"""Frozen-output CPU analysis: analyse.
-Run from the repository root. No model inference or adapter training occurs."""
+"""Reproduce benchmark statistics from the saved predictions on CPU.
+
+Run this from the repository root to write scores, paired comparisons,
+confidence intervals, process summaries and training-exposure tables to
+results/. Questions are grouped by their source dialogue or story when
+estimating uncertainty; no model inference or adapter training occurs.
+"""
 
 from __future__ import annotations
 from project_setup import ensure_analysis_inputs
@@ -35,18 +40,25 @@ LABELS = {
 
 
 def read_json(p):
-    """Read one JSON object from disk."""
+    """Read a saved JSON file and return its Python value. This is used for
+    experiment settings and summaries so the analysis uses the recorded data.
+    """
     return json.loads(Path(p).read_text(encoding="utf8"))
 
 
 def read_rows(p):
-    """Load the saved per-example records without modifying predictions."""
+    """Read the non-empty lines of a JSONL file into a list of records. Keeping
+    the saved order and prediction text lets later steps compare systems
+    without generating new answers.
+    """
     with Path(p).open(encoding="utf8") as f:
         return [json.loads(x) for x in f if x.strip()]
 
 
 def write_json(p, obj):
-    """Write a JSON result using the original serialization convention."""
+    """Save a result as readable JSON with a final newline. Non-finite numbers are
+    rejected so an undefined calculation cannot silently enter a result file.
+    """
     Path(p).write_text(
         json.dumps(obj, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
         encoding="utf8",
@@ -54,29 +66,47 @@ def write_json(p, obj):
 
 
 def sha(p):
-    """Calculate a file checksum so that a changed input is detected before reuse."""
+    """Return the SHA-256 checksum of a file. The analysis records this
+    fingerprint to identify the exact input bytes used for the reported
+    results.
+    """
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
 def index(rows):
-    """Index records by ID and reject duplicates before pairing systems."""
+    """Build a dictionary from record IDs to their records, rejecting duplicate
+    IDs. This lets us pair each model answer with the correct reference rather
+    than relying on file order.
+    """
     out = {r["record_id"]: r for r in rows}
     assert len(out) == len(rows), "Duplicate record IDs"
     return out
 
 
 def determiner(x):
+    """Lowercase a location name and remove a leading a, an or the. This makes
+    reference matching insensitive to articles while preserving the rest of the
+    location text.
+    """
     return re.sub("^(?:a|an|the)\\s+", "", str(x).strip().lower())
 
 
 def overlap(pred, loc):
+    """Measure how many words a prediction shares with a candidate location. The
+    saved fine-location scoring rule uses this fraction to choose between the
+    original and moved locations.
+    """
     a = str(pred).lower().replace("_", " ").replace("'s", "").replace(".", "").split()
     b = str(loc).lower().replace("_", " ").replace("'s", "").split()
     return len(set(a) & set(b)) / len(b) if b else 0.0
 
 
 def parse_open(pred, ref):
-    """Frozen corrected scoring convention; an out-of-target label stays an error."""
+    """Convert an OpenToM reference and raw prediction into comparable labels
+    using the recorded rules for each question family. Ambiguous or malformed
+    predictions retain an error label instead of being removed from the
+    accuracy denominator.
+    """
     p = "" if pred is None else str(pred).strip()
     a = ref["answer"]
     f = ref["family"]
@@ -158,7 +188,10 @@ def parse_open(pred, ref):
 
 # Resample complete source clusters, keeping the systems paired within each draw.
 def bootstrap_counts(n, reps=5000, seed=42):
-    """Sample whole dialogue/story clusters and return their multiplicities."""
+    """Return a matrix recording how often each dialogue or story appears in each
+    bootstrap sample. Sampling whole clusters keeps related questions together,
+    and using the same counts for all systems preserves paired comparisons.
+    """
     rng = random.Random(seed)
     return np.array(
         [
@@ -170,12 +203,18 @@ def bootstrap_counts(n, reps=5000, seed=42):
 
 
 def interval(x):
-    """Return the central 95 percent interval using the saved quantile convention."""
+    """Return the 2.5th and 97.5th percentiles of the supplied estimates. These
+    bounds summarize the central 95 percent of the bootstrap distribution using
+    NumPy linear quantiles.
+    """
     return np.quantile(x, [0.025, 0.975]).tolist()
 
 
 def cluster_statistics(df):
-    """Aggregate correct counts and class statistics within each source cluster."""
+    """Aggregate question counts, correct answers and per-class counts within each
+    dialogue or story. These arrays let us recompute scores for many bootstrap
+    samples without repeatedly expanding individual question rows.
+    """
     groups = sorted(df.cluster.unique())
     families = [f for f in LABELS if f in set(df.family)]
     gindex = {v: i for i, v in enumerate(groups)}
@@ -204,7 +243,13 @@ def cluster_statistics(df):
 
 
 def metrics_for_weights(weights, n, correct, classes, families):
-    """Sufficient-statistics bootstrap, also usable for leave-one-cluster-out."""
+    """Calculate pooled accuracy, equal-family accuracy and fixed-class macro F1
+    from weighted cluster counts. Ordinary scores use weight one, bootstrap
+    scores use sample multiplicities, and omission checks set one cluster
+    weight to zero.
+    """
+    # A row of weights describes one resample. Matrix multiplication adds
+    # whole-cluster counts, including repeated clusters, before calculating ratios.
     den = weights @ n
     accuracy = []
     task_mean = []
@@ -224,6 +269,8 @@ def metrics_for_weights(weights, n, correct, classes, families):
             t = weights @ tp[s]
             fs.append(np.divide(2 * t, d, out=np.zeros_like(t), where=d > 0).mean(1))
         ff1.append(np.stack(fs, axis=1))
+        # Average family F1 values equally; a large family must not dominate
+        # this metric merely because it contains more questions.
         f1.append(np.mean(fs, axis=0))
     return dict(
         accuracy=np.array(accuracy),
@@ -236,16 +283,18 @@ def metrics_for_weights(weights, n, correct, classes, families):
 
 # Swap the two systems at cluster level to preserve within-story dependence.
 def signflip_p(contributions, reps=50000, seed=20260922):
-    """Paired cluster label swaps. Conditional exchangeability is an assumption.
-
-    Zero-contribution clusters can be removed exactly for a linear statistic.
-    Enumerate all assignments up to 18 nonzero clusters; otherwise Monte Carlo
-    with the add-one correction. This is post-hoc, not a randomized experiment."""
+    """Test a paired difference by swapping system labels within whole clusters,
+    assuming exchangeability under the null. Enumerate every swap for at most
+    18 nonzero contributions; otherwise use seeded Monte Carlo swaps with an
+    add-one correction, returning the p-value and sampling details.
+    """
     d = np.asarray(contributions, dtype=float)
     d = d[np.abs(d) > 1e-14]
     obs = abs(d.sum())
     if not len(d):
         return (1.0, 1, "exact", 0)
+    # A sign reversal represents swapping the two systems for one whole
+    # cluster. Exact enumeration is feasible only for a small number of clusters.
     if len(d) <= 18:
         nums = np.arange(2 ** len(d), dtype=np.uint64)[:, None]
         signs = 2 * (nums >> np.arange(len(d), dtype=np.uint64) & 1).astype(float) - 1
@@ -260,7 +309,10 @@ def signflip_p(contributions, reps=50000, seed=20260922):
 
 
 def holm(pvalues):
-    """Adjust the specified family of p-values using the Holm step-down procedure."""
+    """Adjust a family of p-values using the Holm step-down procedure. Sort the
+    values, apply decreasing multiplicity factors and enforce monotonicity
+    before returning them in their original order.
+    """
     p = np.asarray(pvalues)
     order = np.argsort(p)
     out = np.zeros(len(p))
@@ -272,7 +324,11 @@ def holm(pvalues):
 
 
 def load_dataset(root, kind):
-    """Join raw predictions to corrected references by ID, checking complete paired coverage."""
+    """Load all five systems and join their predictions to the reference labels by
+    record ID. Check complete coverage of 621 questions and the expected
+    dialogue or story count, then return the aligned table and structured
+    review records.
+    """
     if kind == "rectom":
         d = root / "inputs/rectom/final_test"
         refs = index(
@@ -315,7 +371,11 @@ def load_dataset(root, kind):
 
 
 def analyse_dataset(root, kind):
-    """Recompute benchmark tables, cluster uncertainty and paired comparisons."""
+    """Produce the score tables, cluster bootstrap intervals and paired
+    comparisons for one benchmark. It also measures the effect of omitting each
+    cluster and writes process records, so the aggregate results can be traced
+    back to individual predictions.
+    """
     df, structured = load_dataset(root, kind)
     out = root / "results"
     df.to_csv(out / (kind + "_prediction_matrix.csv"), index=False)
@@ -325,6 +385,8 @@ def analyse_dataset(root, kind):
     )
     counts = bootstrap_counts(len(groups))
     boot = metrics_for_weights(counts, n, correct, classes, families)
+    # Omit each dialogue/story once to see whether one source cluster
+    # has an unusually large influence on the paired conclusion.
     loo = metrics_for_weights(
         np.ones((len(groups), len(groups))) - np.eye(len(groups)),
         n,
@@ -459,7 +521,10 @@ def analyse_dataset(root, kind):
 
 
 def verify_saved(root, kind, point, boot, families, df):
-    """Compare recalculated metrics and intervals with the frozen saved outputs."""
+    """Compare the recalculated scores and confidence intervals with the original
+    saved benchmark reports. Write a reconciliation report only after the
+    comparisons pass, including the original RecToM interval convention.
+    """
     comparisons = []
     if kind == "rectom":
         saved = read_json(root / "inputs/rectom/final_test/final_metrics.json")
@@ -533,6 +598,10 @@ def verify_saved(root, kind, point, boot, families, df):
 
 
 def json_object(raw):
+    """Scan generated text for the first opening brace from which a JSON value can
+    be decoded. Return that value or None, allowing process analysis to read
+    records that include text around the structured response.
+    """
     decoder = json.JSONDecoder()
     for pos, c in enumerate(raw or ""):
         if c == "{":
@@ -545,7 +614,11 @@ def json_object(raw):
 
 
 def audit_process(root, kind, df, structured):
-    """Count recorded state revisions and answer transitions separately."""
+    """Compare saved states and answers before and after review, and write
+    per-question records and totals. Counting state, citation and answer
+    changes separately prevents a revision event from being mistaken for a
+    correct final answer.
+    """
     records = []
     events = []
     tot = collections.Counter()
@@ -661,7 +734,11 @@ def audit_process(root, kind, df, structured):
 
 
 def training_audit(root):
-    """Recover selected-checkpoint exposure, token counts and validation history from run logs."""
+    """Recover checkpoint exposure and validation history from the saved training
+    logs. Keep the last record for each repeated step so resumed logs do not
+    inflate example or token counts, and write the differences between full
+    schedules and selected checkpoints.
+    """
     records = []
     valid = []
     for arm, condition in [
@@ -672,6 +749,8 @@ def training_audit(root):
         run = p / "runs" / condition
         c = read_json(run / "completed.json")
         log = read_rows(run / "training_log.jsonl")
+        # A resumed log can contain the same optimizer step more than once.
+        # Keep its final record so exposure is not counted twice.
         unique = {r["step"]: r for r in log}
         assert set(unique) == set(range(1, c["step"] + 1))
         best = c["best_step"]
@@ -733,6 +812,11 @@ def training_audit(root):
 
 
 def main():
+    """Run the CPU analysis for both benchmarks after checking that dialogue
+    splits are disjoint. Combine the ten paired accuracy comparisons with Holm
+    adjustment, then save training summaries, input fingerprints and analysis
+    settings.
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     args = ap.parse_args()
@@ -749,6 +833,8 @@ def main():
     for kind in ["rectom", "opentom"]:
         pairs.extend(analyse_dataset(root, kind))
     p = pd.DataFrame(pairs)
+    # The correction family contains all ten post hoc accuracy contrasts
+    # across both benchmarks, rather than a separate correction per dataset.
     p["p_holm_all_ten_accuracy_contrasts"] = holm(p.p_cluster_swap.values)
     p.to_csv(root / "results/paired_comparisons.csv", index=False)
     training_audit(root)

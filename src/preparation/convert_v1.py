@@ -1,4 +1,9 @@
-"""Revision-4 data preparation: convert v1."""
+"""Read fixed RecToM sources and define shared prompts and state mappings.
+
+The final revision-4 builder imports these helpers. Running this module
+directly invokes the earlier reviewed-seed conversion, whose exports differ
+from the full-data experiment built by build_full.py.
+"""
 
 import argparse
 import copy
@@ -40,13 +45,20 @@ FIELDS = {
 
 
 def digest(value):
+    """Hash a JSON representation with sorted keys to identify one source record.
+    Stored review records use this value to detect changes in the source
+    question or dialogue.
+    """
     return hashlib.sha256(
         json.dumps(value, sort_keys=True, ensure_ascii=False).encode()
     ).hexdigest()
 
 
 def write_jsonl(path, rows):
-    """Write the records in order, one JSON object per line."""
+    """Save records in order as one JSON object per line, creating parent folders
+    when needed. This format supports question-level datasets and preserves
+    readable text without ASCII escaping.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "".join((json.dumps(r, ensure_ascii=False) + "\n" for r in rows)),
@@ -55,7 +67,10 @@ def write_jsonl(path, rows):
 
 
 def write_json(path, value):
-    """Write a JSON result using the original serialization convention."""
+    """Save a Python value as indented UTF-8 JSON and create its parent directory.
+    Manifests and checksum tables use this consistent serialization so
+    rebuilding can be compared byte for byte.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(value, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -63,7 +78,11 @@ def write_json(path, value):
 
 
 def load_sources(root):
-    """Read the fixed RecToM task sources and dialogue-level split manifest."""
+    """Read and checksum the two fixed RecToM task files, then reconstruct the
+    seeded split by whole dialogue. Verify the 3,210 questions, 336 dialogues
+    and original split manifest before returning the records and split
+    membership sets.
+    """
     rows = []
     for task, (name, expected) in SOURCES.items():
         raw = (root / "original" / name).read_bytes()
@@ -95,7 +114,10 @@ def load_sources(root):
 
 
 def public_row(row):
-    """Remove answer-bearing fields before constructing the model input."""
+    """Copy only identifiers, dialogue text, question and choices from a source
+    record. Excluding answer-bearing fields keeps reference labels out of the
+    model input exported for evaluation.
+    """
     return {
         k: copy.deepcopy(row[k])
         for k in ("record_id", "dialogue_id", "utterance_pos") + PUBLIC
@@ -103,7 +125,10 @@ def public_row(row):
 
 
 def input_text(row):
-    """Render the original dialogue, question and forced-choice options."""
+    """Render the task, numbered dialogue turns, question and options into the
+    common prompt text. Numbered turns give state and review responses a stable
+    way to cite the supplied evidence.
+    """
     return (
         "Task: "
         + row["task"]
@@ -122,7 +147,13 @@ def input_text(row):
 
 
 def benchmark_state(row):
-    """Decode the benchmark answer into its recorded task-state interpretation."""
+    """Decode the selected benchmark answer option into its implied perspective
+    fields using the recorded wording rules. These are label-derived variables
+    for comparison and probing, rather than independent evidence-grounded
+    annotations.
+    """
+    # This mapping reads the selected answer option. It is a benchmark-label
+    # interpretation and must not be passed to the model as an evaluation input.
     text = " ".join(row["choices"][row["answer"][0]].lower().split())
     if row["task"] == "desire":
         if text not in ("yes", "no"):
@@ -150,7 +181,10 @@ def benchmark_state(row):
 
 
 def training_example(row, kind, prompt, response, suffix=""):
-    """Build one prompt/completion example with its record and split metadata."""
+    """Package a prompt and supervised completion as user/assistant messages with
+    example, record and dialogue IDs. The kind and suffix distinguish multiple
+    supervision examples derived from the same underlying question.
+    """
     return {
         "example_id": row["record_id"] + "/" + kind + suffix,
         "record_id": row["record_id"],
@@ -166,7 +200,10 @@ def training_example(row, kind, prompt, response, suffix=""):
 
 
 def answer_example(row, suffix=""):
-    """Build an ordinary answer-only completion for the matched control."""
+    """Create an ordinary answer-only training example using the official option
+    letter. Optional suffixes give repeated control examples distinct IDs when
+    matching the structured condition exposure.
+    """
     return training_example(
         row,
         "answer_only",
@@ -177,7 +214,11 @@ def answer_example(row, suffix=""):
 
 
 def state_prompt(row):
-    """Build the perspective-state prompt used in the structured supervision."""
+    """Append instructions for an evidence-grounded perspective record to the
+    common question prompt. Request known/unknown distinctions, citations and
+    unsupported option claims so structured supervision has an explicit output
+    schema.
+    """
     return input_text(row) + (
         "\nBuild an evidence-grounded perspective record and choose an answer. Separate observed facts from qualified inferences. Retain unknown for facts the supplied context does not establish. Movie liking and recommendation acceptance are different fields. For a forced-choice answer, list any option claims not established by the evidence. Return JSON with perspective, evidence, state, missing_information, answer and answer_claims_not_established. Each state field has value, evidence_turns, basis and reason. Fields: "
         + json.dumps(FIELDS_FOR_TASK(row))
@@ -185,7 +226,11 @@ def state_prompt(row):
 
 
 def review_prompt(row, current_state, name):
-    """Ask for evidence-sensitive review of the selected state field."""
+    """Build a review request for one selected field using only current values and
+    citation turns. Check that the state contains the task fields and no
+    reference-answer field before asking the model to revise, preserve or
+    retain unknown.
+    """
     if set(current_state) != set(DOMAINS[row["task"]]) or name not in current_state:
         raise ValueError(
             "Review input must contain only the task state fields, not a reference answer"
@@ -205,7 +250,11 @@ def review_prompt(row, current_state, name):
 
 
 def validate_review(row, review):
-    """Check the review schema and selected field, not whether the evidence entails the claim."""
+    """Validate a recorded seed annotation against its source hash, status, state
+    schema and citation bounds. Reject conflicts with the official answer
+    before exporting supervision; this is a record-consistency check rather
+    than an independent semantic review.
+    """
     if review["source_record_sha256"] != digest(row):
         raise ValueError(
             "Review refers to a changed source record: " + row["record_id"]
@@ -256,6 +305,11 @@ def validate_review(row, review):
 
 
 def grounded_target(row, review):
+    """Turn a seed review into a structured target with exact cited quotations,
+    state fields and the official answer. Also list unknown fields and answer
+    claims not established by the annotation, preserving the distinction
+    between forced-choice labels and evidence.
+    """
     slots = copy.deepcopy(review["slots"])
     lines = row["utterance_context"].splitlines()
     refs = sorted({n for c in slots.values() for n in c["evidence_turns"]})
@@ -278,6 +332,11 @@ def grounded_target(row, review):
 
 
 def grounded_examples(row, review):
+    """Create state and review supervision for the earlier reviewed-seed
+    conversion. For known fields it constructs masked, wrong and preserve
+    cases; unknown fields get retain_unknown cases, while the final revision-4
+    expansion lives in build_full.py.
+    """
     target = grounded_target(row, review)
     examples = [
         training_example(
@@ -353,10 +412,19 @@ def grounded_examples(row, review):
 
 
 def FIELDS_FOR_TASK(row):
+    """Return the field descriptions required by the question task. State prompts
+    use this mapping so belief questions request four fields and desire
+    questions request only likely willingness to watch.
+    """
     return {name: FIELDS[name] for name in DOMAINS[row["task"]]}
 
 
 def convert(root, output):
+    """Rebuild the earlier seed-based exports from checked source questions and
+    recorded seed reviews. Save matched controls, a pending-review queue and
+    separated held-out files; the final full-data training pipeline instead
+    calls build_full.run.
+    """
     rows, splits = load_sources(root)
     by_id = {r["record_id"]: r for r in rows}
     partitions = {

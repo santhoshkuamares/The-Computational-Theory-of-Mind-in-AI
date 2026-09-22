@@ -9,10 +9,18 @@ FALLBACK_TENSOR_BYTES = 9319737856
 
 
 def required_space(weight_bytes, cached_bytes, reserve=RESERVE_BYTES):
+    """Estimate free disk space needed for uncached weights plus an output
+    reserve. Already cached bytes reduce the download requirement, but the
+    reserve remains available for checkpoints and reports.
+    """
     return max(0, int(weight_bytes) - int(cached_bytes)) + int(reserve)
 
 
 def shard_name(name):
+    """Validate that a checkpoint shard is a plain safetensors filename. Reject
+    directories and path traversal before using filenames supplied by the model
+    index.
+    """
     p = PurePosixPath(name)
     if (
         p.is_absolute()
@@ -25,6 +33,11 @@ def shard_name(name):
 
 
 def run(root):
+    """Download the pinned Qwen snapshot after checking available disk space and
+    existing cached weights. Verify shard tensor names, available remote
+    checksums and the expected text configuration, then save the snapshot path
+    for model loading.
+    """
     from huggingface_hub import (
         hf_hub_download,
         snapshot_download,

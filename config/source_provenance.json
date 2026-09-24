@@ -519,9 +519,9 @@
   ],
   "documentation_update": {
     "base_commit": "f33ac0d929cca6a378eca29c53ee975730928c81",
-    "scope": "All 311 function definitions in the 31 Python files retained after the user cleanup.",
+    "scope": "All 311 function definitions in the 31 Python files retained after repository cleanup.",
     "change": "Expanded function docstrings, module explanations and comments. Executable AST unchanged after removing docstrings; prompts, settings and calculations retained.",
-    "historical_audit_note": "The original recovery audit above includes files subsequently deleted by the user. Deleted files have not been restored.",
+    "historical_audit_note": "The original recovery audit above is a historical inventory and includes six subsequently removed files. Their entries preserve provenance; they do not indicate that those files are currently present.",
     "gpu_rerun": false
   }
 }

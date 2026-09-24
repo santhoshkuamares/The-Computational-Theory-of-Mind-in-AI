@@ -4,7 +4,7 @@ This repository contains the code and saved outputs for the Subjectesis experime
 
 The study asks whether structured perspective-state supervision and bounded review help computational Theory of Mind. The results are mixed. Improvements, null results and adverse results are retained. The cognitive analysis was added after the benchmark results and is exploratory.
 
-The source was recovered from the executed notebooks, their embedded Python files, the supplied statistical package and the recorded A100 continuation. Each function includes a short explanation of its purpose, how it works and its return value or saved output. Comments inside longer functions explain the decisions that affect the experiment. Prompt wording, labels and scoring rules were retained, except for the explicit OpenToM metadata correction explained below. There is no separate `docs` directory.
+The Python modules consolidate the executed notebooks, statistical analysis scripts and A100 training continuation. Function docstrings explain their purpose, operation and outputs; comments explain experimental choices. Prompt wording, labels and scoring rules match the recorded experiment, apart from the explicit OpenToM metadata correction described below.
 
 ## Repository contents
 
@@ -14,12 +14,12 @@ The source was recovered from the executed notebooks, their embedded Python file
 | `src/preparation/` | Revision-4 preparation rules and original tests |
 | `src/training/` | Model loading, loss, optimizer, checkpointing and runtime checks |
 | `config/` | Settings, recorded environment and source provenance |
-| `data/` | Two compressed input bundles containing data, not hidden executable code |
+| `data/` | Two compressed bundles of frozen data and annotation records |
 | `results/` | Benchmark scores, statistics, process counts and training audit |
 | `results/cognitive/` | Probes, RSA, process summary and counterfactual predictions |
-| `figures/` | Important diagrams and plots, including cognitive results |
+| `figures/` | Architecture diagrams and benchmark and cognitive-analysis plots |
 
-Saved prediction records needed for CPU analysis are included. Trained adapters, optimizer checkpoints and hidden-state arrays remain external. Temporary repair scripts, notebook display output, duplicate figure formats and obsolete OpenToM scores are omitted.
+Saved prediction records needed for CPU analysis are included. Trained adapters, optimizer checkpoints and hidden-state arrays are stored separately. The repository retains the corrected OpenToM scores and PNG figure exports.
 
 ## Reproduce results on CPU
 
@@ -85,7 +85,7 @@ python src/train_answer_only.py
 python src/train_subjectesis.py --root /content/subjectesis_resume --mode a100 --resume /content/drive/MyDrive/Subjectesis/subjectesis_a100_latest.zip
 ```
 
-`train_subjectesis.py` is a small packaging entry point around recovered source. `train_answer_only.py` follows the original Colab sequence and saves recovery output to Drive. The GPU entry scripts execute stages when run and should not be imported as utilities.
+`train_subjectesis.py` stages the preparation and training modules, then runs the selected training mode. `train_answer_only.py` follows the original Colab sequence and saves recovery output to Drive. The GPU entry scripts execute stages when run and should not be imported as utilities.
 
 | Training module | Explanation |
 | --- | --- |
@@ -171,14 +171,14 @@ The code proceeds through these stages:
 5. Count monitoring/control events in saved records. A revision count is not itself revision correctness.
 6. Run 64 information-access cases covering first- and second-order questions and score all five inference conditions.
 
-Hidden states are saved in `MyDrive/Subjectesis/cognitive_analysis/representations/`. They are required to independently refit probes or recompute RSA and were not in the uploaded results archive. The complete code, question index, supplied result tables and plots are included. The CPU checker distinguishes table consistency from an independent representation rerun.
+Hidden states are saved in `MyDrive/Subjectesis/cognitive_analysis/representations/` and are not bundled in this repository. Independently refitting probes or recomputing RSA requires these arrays. The extraction and analysis code, question index, result tables and plots are included. The CPU checker verifies table consistency without repeating the representation analysis.
 
 In `counterfactual_metrics.csv`, paired accuracy means both answers in a pair are correct. Leakage means predicting the new physical location when the target observer missed the move. The original diagnostic excludes missing predictions from these denominators; all saved predictions are valid. The 64 cases are a small post hoc diagnostic, not a large new benchmark.
 
-The probe results do not show a uniform Subjectesis advantage: final-layer `seen` macro F1 is lower than Answer-only by about 0.02465. RSA alignment is higher in the supplied Subjectesis results. Neither observation establishes human-like beliefs or a correspondence between transformer layers and brain regions.
+The probe results do not show a uniform Subjectesis advantage: final-layer `seen` macro F1 is lower than Answer-only by about 0.02465. RSA alignment is higher in the saved Subjectesis results. Neither observation establishes human-like beliefs or a correspondence between transformer layers and brain regions.
 
 ## Repository verification
 
-Preparation rebuilt to the original hashes and passed all 31 data tests. CPU benchmark and supplementary analyses reproduced the supplied numerical outputs; all eight statistical tests passed. Counterfactual metrics and process counts were recomputed from individual records. Probe split separation and final-layer table consistency were checked.
+Preparation rebuilt to the original hashes and passed all 31 data tests. CPU benchmark and supplementary analyses reproduced the saved numerical outputs; all eight statistical tests passed. Counterfactual metrics and process counts were recomputed from individual records. Probe split separation and final-layer table consistency were checked.
 
-`config/source_provenance.json` records the original recovery audit and the documentation update. All 311 functions in the 31 retained Python files have explanations. A syntax-tree comparison, excluding docstrings, confirms that the documentation update leaves executable statements unchanged. GPU training and inference were not rerun, and probe/RSA arrays were not independently recomputed.
+`config/source_provenance.json` records source hashes and the historical recovery audit. Its historical inventory includes six files that were subsequently removed; those entries document provenance rather than the current file list. The current source contains 31 Python files and 311 documented functions. The recorded syntax-tree comparison, excluding docstrings, found no executable changes in the documentation update. GPU training and inference were not rerun during repository verification, and probe/RSA arrays were not independently recomputed.

@@ -1,9 +1,6 @@
-"""Reproduce benchmark statistics from the saved predictions on CPU.
+"""Compute the benchmark statistics from your saved prediction results for CPU.
 
-Run this from the repository root to write scores, paired comparisons,
-confidence intervals, process summaries and training-exposure tables to
-results/. Questions are grouped by their source dialogue or story when
-estimating uncertainty; no model inference or adapter training occurs.
+To produce scores, paired comparisons, confidence intervals, summary of processes and train exposure table run in root of repository, to produce output files results/ (for each question groupings are estimated with respect to their source dialogue or story); no model inference is performed and there will be no model adapter training
 """
 
 from __future__ import annotations
@@ -40,25 +37,19 @@ LABELS = {
 
 
 def read_json(p):
-    """Read a saved JSON file and return its Python value. This is used for
-    experiment settings and summaries so the analysis uses the recorded data.
-    """
+    """Reads a JSON file that has been previously saved to disk and returns it as a python object. The purpose of this is to read in experiment settings/summaries so that you can analyze your recorded data using those settings/summaries.."""
     return json.loads(Path(p).read_text(encoding="utf8"))
 
 
 def read_rows(p):
-    """Read the non-empty lines of a JSONL file into a list of records. Keeping
-    the saved order and prediction text lets later steps compare systems
-    without generating new answers.
-    """
+    """Reads each line (except empty ones) from a JSONL file into a list of records. Preserving the order and keeping the original text allows subsequent steps to be compared by answering the same question w/o having to generate an answer"""
     with Path(p).open(encoding="utf8") as f:
         return [json.loads(x) for x in f if x.strip()]
 
 
 def write_json(p, obj):
-    """Save a result as readable JSON with a final newline. Non-finite numbers are
-    rejected so an undefined calculation cannot silently enter a result file.
-    """
+    """Store the outcome as easily legible JSON followed by a final line break. 
+       Any non-finite number will be rejected, and therefore a calculation that does not provide a finite answer may not produce a result file in silent mode."""
     Path(p).write_text(
         json.dumps(obj, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
         encoding="utf8",
@@ -66,47 +57,32 @@ def write_json(p, obj):
 
 
 def sha(p):
-    """Return the SHA-256 checksum of a file. The analysis records this
-    fingerprint to identify the exact input bytes used for the reported
-    results.
-    """
+    """Compute the SHA-256 hash of a file. This hash is stored within the analysis record for purposes of identifying exactly which byte sequence was utilized to compute the reported outcomes."""
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
 def index(rows):
-    """Build a dictionary from record IDs to their records, rejecting duplicate
-    IDs. This lets us pair each model answer with the correct reference rather
-    than relying on file order.
-    """
+    """Create a dictionary using record ID as keys, linking them to their corresponding record. We will use this dictionary to link each model answer to its appropriate reference, instead of having to rely on the sequence in which the files were loaded."""
     out = {r["record_id"]: r for r in rows}
     assert len(out) == len(rows), "Duplicate record IDs"
     return out
 
 
 def determiner(x):
-    """Lowercase a location name and remove a leading a, an or the. This makes
-    reference matching insensitive to articles while preserving the rest of the
-    location text.
-    """
+    """Convert a location into lowercase and strip off any leading article (a/an/the). The remaining part of the string is preserved while we ignore the articles."""
     return re.sub("^(?:a|an|the)\\s+", "", str(x).strip().lower())
 
 
 def overlap(pred, loc):
-    """Measure how many words a prediction shares with a candidate location. The
-    saved fine-location scoring rule uses this fraction to choose between the
-    original and moved locations.
-    """
+    """Determine the number of words in a candidate location that are also in the prediction. 
+       The previously saved fine-location scoring rule will use this fraction to decide whether to select the original or moved locations.."""
     a = str(pred).lower().replace("_", " ").replace("'s", "").replace(".", "").split()
     b = str(loc).lower().replace("_", " ").replace("'s", "").split()
     return len(set(a) & set(b)) / len(b) if b else 0.0
 
 
 def parse_open(pred, ref):
-    """Convert an OpenToM reference and raw prediction into comparable labels
-    using the recorded rules for each question family. Ambiguous or malformed
-    predictions retain an error label instead of being removed from the
-    accuracy denominator.
-    """
+    """Convert the open to m reference and raw prediction into two comparable labels according to the pre-recorded rules for each question family. The ambiguous or erroneous predictions remain an error label as opposed to being eliminated from the denominator of accuracy."""
     p = "" if pred is None else str(pred).strip()
     a = ref["answer"]
     f = ref["family"]
@@ -188,10 +164,7 @@ def parse_open(pred, ref):
 
 # Resample complete source clusters, keeping the systems paired within each draw.
 def bootstrap_counts(n, reps=5000, seed=42):
-    """Return a matrix recording how often each dialogue or story appears in each
-    bootstrap sample. Sampling whole clusters keeps related questions together,
-    and using the same counts for all systems preserves paired comparisons.
-    """
+    """Provide a data matrix that indicates what number of times each of your dialogues or stories occurs in every single one of your bootstrap samples. By taking entire clusters into consideration we can group the associated questions, and by using the exact same count for every system we are able to preserve the comparison of pairs."""
     rng = random.Random(seed)
     return np.array(
         [
@@ -203,18 +176,12 @@ def bootstrap_counts(n, reps=5000, seed=42):
 
 
 def interval(x):
-    """Return the 2.5th and 97.5th percentiles of the supplied estimates. These
-    bounds summarize the central 95 percent of the bootstrap distribution using
-    NumPy linear quantiles.
-    """
+    """Give me the 2.5th and 97.5th percentiles of these estimates. This is a way (using numpy's linear quantile function) to express the middle 95% of the bootstrap distribution with numerical bounds."""
     return np.quantile(x, [0.025, 0.975]).tolist()
 
 
 def cluster_statistics(df):
-    """Aggregate question counts, correct answers and per-class counts within each
-    dialogue or story. These arrays let us recompute scores for many bootstrap
-    samples without repeatedly expanding individual question rows.
-    """
+    """This function aggregates the count of total questions, the amount of correct answers, and the per class counts for each of the dialogues or stories. The arrays generated will allow us to be able to calculate scores for multiple bootstrap samples without having to expand each individual question row."""
     groups = sorted(df.cluster.unique())
     families = [f for f in LABELS if f in set(df.family)]
     gindex = {v: i for i, v in enumerate(groups)}
@@ -244,10 +211,9 @@ def cluster_statistics(df):
 
 def metrics_for_weights(weights, n, correct, classes, families):
     """Calculate pooled accuracy, equal-family accuracy and fixed-class macro F1
-    from weighted cluster counts. Ordinary scores use weight one, bootstrap
-    scores use sample multiplicities, and omission checks set one cluster
-    weight to zero.
-    """
+       from weighted cluster counts. Ordinal scores are based on weight 1, bootstrap 
+       scores are based on sample multiplicity, and omission check sets one cluster 
+       weight to 0."""
     # A row of weights describes one resample. Matrix multiplication adds
     # whole-cluster counts, including repeated clusters, before calculating ratios.
     den = weights @ n
@@ -283,10 +249,11 @@ def metrics_for_weights(weights, n, correct, classes, families):
 
 # Swap the two systems at cluster level to preserve within-story dependence.
 def signflip_p(contributions, reps=50000, seed=20260922):
-    """Test a paired difference by swapping system labels within whole clusters,
-    assuming exchangeability under the null. Enumerate every swap for at most
-    18 nonzero contributions; otherwise use seeded Monte Carlo swaps with an
-    add-one correction, returning the p-value and sampling details.
+    """Test a paired difference by exchanging labels in whole clusters, 
+      assuming exchangeability under the null hypothesis. Enumerate each possible 
+     exchange for at most 18 non-zero contributions; if there is no such enumeration 
+     perform randomized exchanges using seeded monte carlo with an add-one correction 
+      and return the p-value as well as information about how many samples were taken.
     """
     d = np.asarray(contributions, dtype=float)
     d = d[np.abs(d) > 1e-14]

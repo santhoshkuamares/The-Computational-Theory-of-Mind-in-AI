@@ -39,7 +39,7 @@
     "rectom_reported_pooled_accuracy": "correct questions / 621",
     "rectom_review": "bounded per-field plan; 1313 calls on 621 sealed-test questions",
     "opentom_commit": "3f22b66276b2d7ca5fe573c28c79cc0d077aafc5",
-    "opentom_scoring": "corrected explicit plot_info keys, strict 621-question denominator",
+    "opentom_scoring": "corrrected explicit plot_info keys, strict 621-question denominator",
     "cognitive_analysis": "post hoc exploratory; frozen Qwen and adapters, fitted linear probes"
   }
 }

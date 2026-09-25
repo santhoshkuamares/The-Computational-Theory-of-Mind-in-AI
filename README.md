@@ -1,10 +1,10 @@
 # The Computational Theory of Mind in AI
 
-This repository contains the code and saved outputs for the Subjectesis experiment with `Qwen/Qwen3.5-4B`: data preparation, both training conditions, validation, final RecToM testing, OpenToM transfer, statistics and exploratory cognitive analysis.
+The repository holds the code and outputs resulting from the Subjectesis experiment `Qwen/Qwen3.5-4B`: Data Preparation, Both Training Conditions, Validation, Final RecToM Test Results, OpenToM Transfer, Statistical Analysis and Exploratory Cognitive Analysis.
 
-The study asks whether structured perspective-state supervision and bounded review help computational Theory of Mind. The results are mixed. Improvements, null results and adverse results are retained. The cognitive analysis was added after the benchmark results and is exploratory.
+This study aims to determine if Structured Perspective-State Supervision and Bounded Review can improve a Computational Theory of Mind. There were varied results. Positive Changes, Null Results and Negative Changes are all included. The Cognitive Analysis was added after the Benchmark Results and thus is exploratory.
 
-The Python modules consolidate the executed notebooks, statistical analysis scripts and A100 training continuation. Function docstrings explain their purpose, operation and outputs; comments explain experimental choices. Prompt wording, labels and scoring rules match the recorded experiment, apart from the explicit OpenToM metadata correction described below.
+The Python modules include the executed Notebooks, Statistical Analysis Scripts and the A100 Training Continuation. Docstrings explain what each function does, how it operates and what output it produces; comments provide explanations for particular experimental decisions. Prompt Wording, Labels and Scoring Rules correspond to those of the recorded experiment, except for the explicitly documented OpenToM Metadata Correction described below.
 
 ## Repository contents
 
@@ -53,11 +53,11 @@ There are 5,000 bootstrap repetitions, resampling dialogues for RecToM and stori
 python src/train_subjectesis.py --root work/subjectesis --prepare-only
 ```
 
-Preparation rebuilds revision 4 from the bundled task data, split manifest and annotation decisions. It runs the 31 original preparation tests and verifies the original output hashes. No GPU is needed.
+This process rebuilds revision 4 using both of the task data and splits in the bundle along with the decision points to annotate. It will run all 31 of the original preparation tests and compare them against their original hash values. A gpu is not needed for this step.
 
-The split contains 235 training, 34 validation and 67 test dialogues. Of 2,270 original training questions, 35 are quarantined, leaving 2,235 eligible questions. Validation has 319 questions; the sealed test has 621.
+The split includes 235 dialogue's for training, 34 for validation and 67 for testing. Of the 2270 original training questions, there are 35 that have been quarantined, so only 2235 remain available as a part of the training. There are 319 available validation questions and an additional 621 questions on the sealed test.
 
-Both full training schedules contain 30,266 examples with identical question-exposure counts. Answer-only repeats ordinary answer supervision. Subjectesis contains 2,235 answer examples, 2,235 state-building examples and 25,796 field-review examples.
+Each of the two full training schedules (answer-only and subjectesis) include 30266 examples with equivalent exposure of each question.
 
 | Preparation module | Explanation |
 | --- | --- |
@@ -70,9 +70,10 @@ Both full training schedules contain 30,266 examples with identical question-exp
 
 ## Training
 
-Model revision: `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`. Settings: NF4 QLoRA, rank 8, alpha 16, learning rate 0.0001, effective batch size 8, maximum length 2,048 and seed 42. Checkpoint selection uses the mean of validation belief and desire accuracy.
+Model revision: `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`. Settings: NF4 QLoRA with Rank 8, Alpha = 16, Learning Rate = 0.0001, Effective Batch Size = 8, Max Length = 2048. 
+Validation belief and desire accuracy were averaged to determine which checkpoint was selected for evaluation.
 
-Subjectesis began on two Kaggle T4 GPUs and continued on one Colab A100. Answer-only used one A100. The scripts retain the original environment checks and install their recorded model-library dependencies. They expect the corresponding host Torch/CUDA environment; the CPU `requirements.txt` is not a GPU environment replacement.
+Subjectesis was run on two Kaggle T4 GPUs and then moved to one Colab A100. Only Answer-Only ran on an A100. Both Subjectesis and Answer-Only retain the original checks against the environment in which they are running and install their respective library/model dependencies as previously captured. In addition, both scripts require the same host environment for Torch/CUDA. There is no replacement for a GPU environment using the CPU `requirements.txt`.
 
 ```bash
 # Start in the recorded two-T4 Kaggle runtime.
@@ -99,9 +100,9 @@ python src/train_subjectesis.py --root /content/subjectesis_resume --mode a100 -
 | `launch.py`, `setup_runtime.py` | Check and set up the original two-T4 environment, launch training, stream progress and package recovery outputs. |
 | `common.py` | Provides checked data loading, hashing, batch grouping and recovery packaging. |
 
-Formatting changes source-byte hashes. Historical resume therefore restores exact code from the verified recovery archive and retains the original identity checks. Use a fresh working directory for restoration. A fresh run on different hardware is not claimed to reproduce identical weights.
+Changes to formatting restore byte-hashes. The historical-resume utilizes the recovered archives of exact code and maintains the original identity checks. Restoration occurs in a new working directory. No claim is made that running again with different hardware will produce identical weights.
 
-Answer-only selected step 1,000 after 8,000 example exposures; Subjectesis selected step 2,500 after 20,000 exposures. Full schedules are exposure-matched, but evaluated checkpoints and target-token compute are not. `training_audit.csv` records these differences.
+Step 1,000 after 8,000 examples, Selected Step 2,500 after 20,000 exposures; Exposure matched full schedules are utilized, but checkpoint evaluation and target token computation are not  `training_audit.csv` records the discrepancies.
 
 ## Validation, testing and transfer
 
@@ -114,7 +115,7 @@ python src/evaluate_opentom.py
 python src/rescore_opentom.py
 ```
 
-All except the rescoring script perform GPU inference. To inspect existing results without inference, use the CPU commands above. Paths are near the top of each script. The original Drive destinations are retained; use separate output paths for a new experiment. Each script retains its saved-metadata checks for prediction reuse.
+Inference is performed by all scripts except for Rescoring Script. If you want to see pre-existing results from an earlier run w/o performing inference again, you can use the CPU commands listed at the beginning of this document. Near the top of each of these scripts will be where you find your path information. A separate output path should be created when running a different experiment than was originally used in Drive. Each script has retained it's metadata save check that allows for reusing predictions.
 
 | Script | Explanation |
 | --- | --- |
@@ -123,9 +124,11 @@ All except the rescoring script perform GPU inference. To inspect existing resul
 | `evaluate_opentom.py` | Selects the recorded smoke/final stories from pinned OpenToM commit `3f22b66276b2d7ca5fe573c28c79cc0d077aafc5`, then saves direct and structured predictions. |
 | `rescore_opentom.py` | Rebuilds corrected metadata and references and scores already-frozen predictions on CPU, retaining prediction hash checks. Downloads the pinned OpenToM source. |
 
-The five conditions are Base direct, Answer-only direct, Subjectesis direct, Subjectesis no review and Subjectesis review. The structured conditions share the same initial state.
+There are five conditions in RecToM (Base Direct; Answer-Only Direct; Subjectesis Direct; Subjectesis No Review; and Subjectesis Review). All of the structured conditions start with the same initial state.
 
-RecToM has a bounded field-review plan, not a universal one-review limit: 1,313 review calls across 621 questions, 48 field-value changes across 45 questions, and no final-answer changes. Citation binding checks text-to-turn correspondence, not semantic entailment.
+RecToM has a bounded field-review plan and is not based on a single universal review call limit: 1,313 review calls were made during 621 questions, and 48 field-value changes occurred over 45 questions. There was also no final answer changes as a result of review.
+
+Citation Binding does correspondences for text-to-turns rather than semantic entailments.
 
 OpenToM required explicit lookup of `mover`, `observer`, `eoi`, `original_place` and `move_to_place`, rather than dictionary value order. Corrected scoring includes all 621 questions across 27 stories. The old 540-scorable score is obsolete. The correction did not regenerate model answers.
 
@@ -160,25 +163,28 @@ In the system tables, `accuracy` means correct questions divided by all question
 python src/cognitive_analysis.py
 ```
 
-This is the original A100 workflow using the completed archives and saved benchmark records. It uses the same plain RecToM prompt across all three model conditions and extracts the final real prompt-token representation from the embedding output and all 32 layers. Qwen and its adapters are frozen; the small linear probe classifiers are fitted.
+This is a new A100 Workflow, which will utilize existing archive files and benchmark results. 
+The workflow is utilizing the same "plain RecToM" prompt for testing each of the three models, and extracting the last actual prompt token representation from the output of the embedding representations for all 32 layers. All Qwen & Adapter Layers remain constant (only the Small Linear Probe Classifier Weights are being trained.)
 
-The code proceeds through these stages:
+The system will pass through each of the following steps:
 
-1. Build the 2,235 / 319 / 621 question index with dialogue-separated splits.
-2. Extract and save hidden states for Base, Answer-only and Subjectesis, with a memory fallback.
-3. Fit standardized, balanced logistic regression probes with `C=1.0`. Save layer-wise scores and final-layer dialogue-bootstrap comparisons.
-4. Compare cosine-distance geometry to benchmark belief-state geometry using RSA; estimate final-layer uncertainty by deleting one dialogue at a time.
-5. Count monitoring/control events in saved records. A revision count is not itself revision correctness.
-6. Run 64 information-access cases covering first- and second-order questions and score all five inference conditions.
+1. Create an index of 2,235 / 319 / 621 questions that are split from dialogue as separate.
+2. Take the hidden states for Base, Answer only, and Subjectesis and save them for future reference.
+3. Use `C=1.0`and fit a standardized, well-balanced set of logistic regression probes. Save both the layer-by-layer scores and a comparison of the final layer dialogue-bootstrap scores. 
+4. Compare Cosine-Distance Geometry to Benchmark Belief-State Geometry using RSA; estimate the final layer's uncertainty by removing a single dialogue item at a time. 
+5. Record (count) all monitoring/control events recorded in previously-saved files. A revision-count is not necessarily indicative of the correctness of a revision. 
+6. Run 64 different information access scenarios. These cover first and second order questions and score each of the five possible inference conditions.
 
-Hidden states are saved in `MyDrive/Subjectesis/cognitive_analysis/representations/` and are not bundled in this repository. Independently refitting probes or recomputing RSA requires these arrays. The extraction and analysis code, question index, result tables and plots are included. The CPU checker verifies table consistency without repeating the representation analysis.
+Representational files (hidden state arrays) can be found at `MyDrive/Subjectesis/cognitive_analysis/representations/`  however, they were not included in this version of the repository to prevent large file sizes. These representational files would have to be separately generated if you wanted to either independently fit the probes for your dataset or recompute RSA.
 
-In `counterfactual_metrics.csv`, paired accuracy means both answers in a pair are correct. Leakage means predicting the new physical location when the target observer missed the move. The original diagnostic excludes missing predictions from these denominators; all saved predictions are valid. The 64 cases are a small post hoc diagnostic, not a large new benchmark.
+The remaining extracted information (and its associated analyses), question indices, results, and graphs/plots are contained within this repository. Additionally, this repository includes a CPU checking tool that ensures consistent output on all relevant results from the representation analysis without requiring another iteration of the representation analysis.
 
-The probe results do not show a uniform Subjectesis advantage: final-layer `seen` macro F1 is lower than Answer-only by about 0.02465. RSA alignment is higher in the saved Subjectesis results. Neither observation establishes human-like beliefs or a correspondence between transformer layers and brain regions.
+Paired accuracy in  `counterfactual_metrics.csv`, refers to pairs where both possible answers are correct. In addition, leakage is defined as determining whether an observer will be able to predict the new physical location after missing one of the moves by using the counterfactual. However, the initial diagnostic excluded missing predictions from these denominators. All saved predictions are therefore valid. The 64 cases shown here are a small, post-hoc diagnostic rather than a large, new benchmark.
 
-## Repository verification
+The subjectesis results from probes did not indicate an advantage for the subjectesis approach across layers. Macro F1 on final layer `seen` was .02465 less than answer-only. Alignment of rsa on the final layers was greater in the saved results of the subjectesis experiment. However, neither finding supports human-like belief or correspondence between layers in transformers with areas of the brain.
 
-Preparation rebuilt to the original hashes and passed all 31 data tests. CPU benchmark and supplementary analyses reproduced the saved numerical outputs; all eight statistical tests passed. Counterfactual metrics and process counts were recomputed from individual records. Probe split separation and final-layer table consistency were checked.
+## Verification of repository
 
-`config/source_provenance.json` records source hashes and the historical recovery audit. Its historical inventory includes six files that were subsequently removed; those entries document provenance rather than the current file list. The current source contains 31 Python files and 311 documented functions. The recorded syntax-tree comparison, excluding docstrings, found no executable changes in the documentation update. GPU training and inference were not rerun during repository verification, and probe/RSA arrays were not independently recomputed.
+All source files have been rebuilt to their original hash values and all 31 data tests pass. Numerical output from cpu benchmarks and supplemental analysis has been reproduced. All eight statistical tests are successful. Counterfactual metrics and process counts were recalculated using each individual record. Consistency of separation between the two probe splits and the final-layer table was verified.
+
+Historical recovery audit is in `config/source_provenance.json`. This is along with historical inventory of six files that were since deleted. Entries related to these six files represent provenance, not the present set of files. Presently there are 31 python files containing 311 documented function calls. Comparison of syntax trees (excluding doc strings) indicates there are no functional changes to documentation within the update. Since gpu training/inference was not run again while verifying the repository, nor were the probe/rsa arrays recreated independently.

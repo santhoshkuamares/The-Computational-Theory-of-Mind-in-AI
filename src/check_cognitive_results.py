@@ -1,9 +1,6 @@
-"""Check the saved cognitive outputs without loading Qwen or using a GPU.
-
-Counterfactual scores and process counts are recomputed from individual saved
-records. Probe and RSA tables are checked for consistency only: independently
-refitting them requires the hidden-state arrays saved in the original run.
-"""
+"""Verify the stored cognitive output information without running Qwen or using a GPU.
+The counterfactual scores and process counts will be recalculated directly from each of the individual records that were previously stored. However, probe and rsa table data is only verified to be consistent with itself (i.e., no new fits of these tables are done).
+If you want to refit either table on its own, you would need access to the "hidden state" array data that was also stored as part of the original run."""
 
 from collections import Counter
 from pathlib import Path
@@ -35,11 +32,10 @@ def read_rows(path):
 
 
 def check_counterfactuals():
-    """Recalculate accuracy, success on both members of a pair, and
-    unobserved-location leakage from the 64 saved cases. Check that the cases
-    match the frozen diagnostic and that the recomputed table matches the
-    supplied results; no model is run.
-    """
+    """the accuracy, success for each member of a pair and 
+      unseen location leakage for the 64 cases which were preserved. 
+      Confirm these are the same as the frozen diagnostics and the new tables 
+      are equal to the reported results; no model will be run."""
     frame = pd.read_csv(RESULTS / "counterfactual_predictions.csv")
     frame["options"] = frame.options.map(ast.literal_eval)
     frozen = {
@@ -101,11 +97,10 @@ def check_counterfactuals():
 
 
 def check_process_counts():
-    """Recount review decisions and changes to states, evidence and answers from
-    the saved RecToM and OpenToM records. Compare the totals with the cognitive
-    process summary, keeping a state revision distinct from an improvement in
-    correctness.
-    """
+    """Count all reviews made by the system (i.e., ReviewToModel) and 
+    all modifications to states, evidence or answers stored in the saved 
+    ReviewToModel and OpenToModel files. Compare total counts against the 
+    cognitive process summaries and keep separate tracking for revisions of state versus corrections in answer."""
     expected = json.loads(
         (RESULTS / "monitoring_control_process_summary.json").read_text()
     )

@@ -1,11 +1,7 @@
-"""Investigate frozen-model representations and perspective-sensitive behavior.
-
-This exploratory follow-up extracts hidden states for the same RecToM prompts,
-fits linear probes, measures representational similarity, counts saved review
-events and evaluates 64 controlled information-access cases. Qwen and its
-adapters stay frozen; only the small probe classifiers are fitted. The
-representation arrays saved during extraction are required to independently
-refit probes or recompute RSA.
+"""Study frozen model representations and perspective sensitivity. This is an initial exploratory study using a second set of RecToM prompts with the same settings as before. 
+Hidden states will be extracted again, linear probes fit, and representation similarity analysis (RSA) performed. Additionally, we'll count the number of times reviews were "saved," and
+run 64 controlled tests on what information can be accessed. Qwen and all adapters will remain frozen, but small probe classifier weights will be optimized for each test. We need to save the representation
+arrays from the extraction step so that we can refit probes and recompute RSA.
 """
 
 from project_setup import mount_drive, prepare_project
@@ -46,17 +42,15 @@ SEED = 42
 
 
 def sha256_bytes(data):
-    """Return a SHA-256 checksum for bytes read from an archive member. This binds
-    the analysis to the saved completion metadata and selected adapter weights.
-    """
+    """Compute a SHA-256 checksum of the bytes that have been read by an archiver from one of its members. 
+        The result is tied to both the saved completion metadata and the selected adapter weights."""
     return hashlib.sha256(data).hexdigest()
 
 
 def verify_training_archive(path, condition):
-    """Verify the completion record and best-adapter files against the recovery
-    manifest. Require a completed 30,266-example schedule and return the
-    metadata identifying the checkpoint used for frozen-model analysis.
-    """
+    """This function verifies a completion record with the best adapters and the corresponding recovery manifest.
+       It checks whether the 30,266-example schedule was completed and returns the metadata related to the checkpoint which 
+       has been used for frozen model analysis."""
     with zipfile.ZipFile(path) as z:
         manifest = json.loads(z.read("recovery_manifest.json"))["files"]
         completed_name = f"runs/{condition}/completed.json"
